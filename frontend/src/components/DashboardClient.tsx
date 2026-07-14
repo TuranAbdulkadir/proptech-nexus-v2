@@ -52,17 +52,17 @@ export default function DashboardClient({ initialMetrics }: { initialMetrics: an
             if (err.name !== 'AbortError') {
                 // Backend is likely offline/not deployed yet. Fallback to mock data to keep UI alive.
                 const mockProperties: Property[] = [
-                    { id: 'prop-1', latitude: 40.7128, longitude: -74.0060, price: 5500000, type: 'commercial', address: 'Wall Street Tower Alpha' } as any,
-                    { id: 'prop-2', latitude: 40.7580, longitude: -73.9855, price: 12500000, type: 'residential', address: 'Times Square Penthouse' } as any,
-                    { id: 'prop-3', latitude: 40.7484, longitude: -73.9857, price: 8000000, type: 'commercial', address: 'Empire Sector Node' } as any,
-                    { id: 'prop-4', latitude: 40.7306, longitude: -73.9352, price: 1200000, type: 'industrial', address: 'Cyber Node Alpha' } as any,
-                    { id: 'prop-5', latitude: 40.7406, longitude: -73.9452, price: 2500000, type: 'residential', address: 'Neon Heights' } as any,
-                    { id: 'prop-6', latitude: 40.7206, longitude: -73.9252, price: 800000, type: 'industrial', address: 'Grid Sector 7' } as any,
-                    { id: 'prop-7', latitude: 40.7050, longitude: -74.0090, price: 18000000, type: 'commercial', address: 'Financial District Hub' } as any,
-                    { id: 'prop-8', latitude: 40.7614, longitude: -73.9776, price: 9500000, type: 'residential', address: 'MoMA Sky-Loft' } as any,
-                    { id: 'prop-9', latitude: 40.7112, longitude: -74.0000, price: 3400000, type: 'commercial', address: 'Pace University Node' } as any,
-                    { id: 'prop-10', latitude: 40.7350, longitude: -73.9920, price: 4200000, type: 'residential', address: 'Union Square Condo' } as any,
-                    { id: 'prop-11', latitude: 40.7250, longitude: -74.0000, price: 6700000, type: 'commercial', address: 'SoHo Art District Hub' } as any,
+                    { id: 'prop-1', latitude: 40.7128, longitude: -74.0060, price: 5500000, sqft: 4200, bedrooms: 3, bathrooms: 4, type: 'commercial', address: 'Wall Street Tower Alpha' } as any,
+                    { id: 'prop-2', latitude: 40.7580, longitude: -73.9855, price: 12500000, sqft: 6500, bedrooms: 5, bathrooms: 6, type: 'residential', address: 'Times Square Penthouse' } as any,
+                    { id: 'prop-3', latitude: 40.7484, longitude: -73.9857, price: 8000000, sqft: 5000, bedrooms: 0, bathrooms: 2, type: 'commercial', address: 'Empire Sector Node' } as any,
+                    { id: 'prop-4', latitude: 40.7306, longitude: -73.9352, price: 1200000, sqft: 1500, bedrooms: 2, bathrooms: 1, type: 'industrial', address: 'Cyber Node Alpha' } as any,
+                    { id: 'prop-5', latitude: 40.7406, longitude: -73.9452, price: 2500000, sqft: 2200, bedrooms: 3, bathrooms: 2, type: 'residential', address: 'Neon Heights' } as any,
+                    { id: 'prop-6', latitude: 40.7206, longitude: -73.9252, price: 800000, sqft: 1200, bedrooms: 1, bathrooms: 1, type: 'industrial', address: 'Grid Sector 7' } as any,
+                    { id: 'prop-7', latitude: 40.7050, longitude: -74.0090, price: 18000000, sqft: 12000, bedrooms: 0, bathrooms: 8, type: 'commercial', address: 'Financial District Hub' } as any,
+                    { id: 'prop-8', latitude: 40.7614, longitude: -73.9776, price: 9500000, sqft: 4800, bedrooms: 4, bathrooms: 4, type: 'residential', address: 'MoMA Sky-Loft' } as any,
+                    { id: 'prop-9', latitude: 40.7112, longitude: -74.0000, price: 3400000, sqft: 2800, bedrooms: 0, bathrooms: 2, type: 'commercial', address: 'Pace University Node' } as any,
+                    { id: 'prop-10', latitude: 40.7350, longitude: -73.9920, price: 4200000, sqft: 3100, bedrooms: 3, bathrooms: 3, type: 'residential', address: 'Union Square Condo' } as any,
+                    { id: 'prop-11', latitude: 40.7250, longitude: -74.0000, price: 6700000, sqft: 4000, bedrooms: 0, bathrooms: 4, type: 'commercial', address: 'SoHo Art District Hub' } as any,
                 ];
                 
                 const filteredData = mockProperties.filter(p => p.price <= filters.maxPrice && p.price >= filters.minPrice);

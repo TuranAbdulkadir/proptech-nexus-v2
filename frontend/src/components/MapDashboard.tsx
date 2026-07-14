@@ -23,8 +23,11 @@ export default function MapDashboard({ properties, onPropertyClick, onBoundsChan
         map.current = L.map(mapContainer.current, {
             center: [40.730610, -73.935242], // Leaflet uses [lat, lng]
             zoom: 12,
-            zoomControl: false // Hide default controls for a cleaner UI
+            zoomControl: false // Hide default controls from top left
         });
+
+        // Add zoom controls to the bottom right
+        L.control.zoom({ position: 'bottomright' }).addTo(map.current);
 
         // Add CartoDB Dark Matter tile layer for the cyber aesthetic
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
