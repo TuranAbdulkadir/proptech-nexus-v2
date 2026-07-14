@@ -1,7 +1,21 @@
 import asyncpg
 import os
+from urllib.parse import urlparse, urlunparse
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/postgres")
+raw_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/postgres")
+
+def fix_supabase_url(url: str) -> str:
+    # Supabase IPv4 Pooler routing often fails with asyncpg (tenant/user not found)
+    # We dynamically rewrite it to a direct connection to bypass the pooler entirely.
+    if "pooler.supabase.com" in url:
+        parsed = urlparse(url)
+        if parsed.username and "." in parsed.username:
+            user, project_ref = parsed.username.split(".", 1)
+            new_netloc = f"{user}:{parsed.password}@db.{project_ref}.supabase.co:5432"
+            return urlunparse((parsed.scheme, new_netloc, parsed.path, parsed.params, "", parsed.fragment))
+    return url
+
+DATABASE_URL = fix_supabase_url(raw_url)
 
 async def init_db_pool():
     """
