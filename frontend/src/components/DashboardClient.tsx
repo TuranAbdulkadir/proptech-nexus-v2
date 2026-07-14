@@ -35,7 +35,7 @@ export default function DashboardClient({ initialMetrics }: { initialMetrics: an
             });
 
             // Make the HTTP request to the async FastAPI backend via environment variables
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "https://proptech-backend.up.railway.app"}/properties/search/bbox?${params}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "https://proptech-nexus-v2-production.up.railway.app"}/properties/search/bbox?${params}`, {
                 signal: abortControllerRef.current.signal
             });
             
