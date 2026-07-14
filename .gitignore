@@ -1,0 +1,46 @@
+# ========================================
+# ENVIRONMENT VARIABLES & CREDENTIALS
+# ========================================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.pem
+*.key
+*.cert
+
+# ========================================
+# NODE / NEXT.JS FRONTEND
+# ========================================
+node_modules/
+npm-debug.log
+yarn-error.log
+.next/
+out/
+build/
+.pnp
+.pnp.js
+
+# ========================================
+# PYTHON / FASTAPI BACKEND
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env_python/
+pip-log.txt
+pytest_cache/
+.coverage
+htmlcov/
+
+# ========================================
+# IDE / OS ARTIFACTS
+# ========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
