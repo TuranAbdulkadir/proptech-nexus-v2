@@ -71,36 +71,59 @@ export default function DashboardClient({ initialMetrics }: { initialMetrics: an
         }
     }, [filters]);
 
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://proptech-nexus-v2-production.up.railway.app";
+
     const handlePropertyClick = async (prop: Property) => {
-        // Hydrating the extended audit view (Simulating the /api/properties/{id}/audit call)
+        try {
+            const res = await fetch(`${BACKEND_URL}/audits/${prop.id}`);
+            if (res.ok) {
+                const audit = await res.json();
+                const extended: PropertyExtended = {
+                    ...prop,
+                    opportunityScore: audit.annualizedRoi > 6 ? 8.5 : 5.0,
+                    securityScore: audit.securityScore,
+                    hazardScore: audit.floodZone.includes("High") ? 75 : 20,
+                    grossRent: audit.grossRent,
+                    propertyTax: audit.propertyTax,
+                    hoaFee: audit.hoaFee,
+                    vacancyBuffer: audit.vacancyBuffer,
+                    netCashflow: audit.netCashflow,
+                    annualizedRoi: audit.annualizedRoi,
+                    openIotPorts: audit.openIotPorts,
+                    crimeIndex: audit.crimeIndex,
+                    distanceToPolice: audit.distanceToPolice,
+                    floodZone: audit.floodZone,
+                    seismicSafety: audit.seismicSafety,
+                    structuralDefects: audit.structuralDefects || []
+                };
+                setSelectedProperty(extended);
+                return;
+            }
+        } catch (err) {
+            console.warn("Backend audit unavailable, using local simulation:", err);
+        }
+
+        // Fallback: local simulation if backend is unreachable
+        const seed = prop.id.charCodeAt(prop.id.length - 1);
         const extended: PropertyExtended = {
             ...prop,
-            opportunityScore: 8.5,
-            securityScore: 85,
-            hazardScore: 20,
+            opportunityScore: 6.0 + (seed % 4),
+            securityScore: 40 + (seed * 7) % 55,
+            hazardScore: 10 + (seed * 3) % 60,
             grossRent: prop.price * 0.008,
-            propertyTax: (prop.price * 0.012) / 12,
+            propertyTax: (prop.price * 0.0192) / 12,
             hoaFee: 250,
             vacancyBuffer: (prop.price * 0.008) * 0.05,
-            netCashflow: (prop.price * 0.008) - ((prop.price * 0.012) / 12) - 250 - ((prop.price * 0.008) * 0.05),
-            annualizedRoi: 7.2,
-            openIotPorts: ['80 (HTTP/Web)', '554 (RTSP/Camera)'],
-            crimeIndex: 35,
-            distanceToPolice: 1.2,
-            floodZone: 'Zone X (Minimal Risk)',
-            seismicSafety: 88,
-            structuralDefects: [
-                {
-                    type: 'structural_crack',
-                    box: [0.65, 0.20, 0.75, 0.35],
-                    confidence: 0.88
-                },
-                {
-                    type: 'water_damage',
-                    box: [0.15, 0.70, 0.30, 0.90],
-                    confidence: 0.94
-                }
-            ]
+            netCashflow: (prop.price * 0.008) - ((prop.price * 0.0192) / 12) - 250 - ((prop.price * 0.008) * 0.05),
+            annualizedRoi: ((prop.price * 0.008 - (prop.price * 0.0192) / 12 - 250 - (prop.price * 0.008) * 0.05) * 12) / prop.price * 100,
+            openIotPorts: seed % 3 === 0 ? ['554 (RTSP/Camera)', '80 (HTTP)'] : [],
+            crimeIndex: 20 + (seed * 5) % 60,
+            distanceToPolice: 0.5 + (seed % 4) * 0.8,
+            floodZone: seed % 4 === 0 ? 'Zone AE (High Risk Floodplain)' : 'Zone X (Minimal Risk)',
+            seismicSafety: 50 + (seed * 3) % 49,
+            structuralDefects: seed % 2 === 0 ? [
+                { type: 'Structural Crack', box: [0.15, 0.20, 0.45, 0.55], confidence: 0.88 },
+            ] : []
         };
         setSelectedProperty(extended);
     };
