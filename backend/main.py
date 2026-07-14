@@ -32,12 +32,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="PropTech-Nexus v2", lifespan=lifespan)
 
-# CORS Middleware
+# CORS Middleware - Hardened for Production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Should be restricted to Next.js frontend domain in production
+    allow_origins=["https://frontend-cyan-one-71.vercel.app", "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 

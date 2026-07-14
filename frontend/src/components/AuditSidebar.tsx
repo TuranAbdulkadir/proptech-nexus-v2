@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { PropertyExtended } from '@/types';
+import { PropertyExtended } from '../types';
 
 interface AuditSidebarProps {
     property: PropertyExtended | null;

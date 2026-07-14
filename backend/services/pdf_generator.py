@@ -1,19 +1,13 @@
 import io
 import logging
+import asyncio
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import HexColor
 
 logger = logging.getLogger(__name__)
 
-async def generate_audit_report(pool, property_id: str) -> bytes:
-    """
-    Compiles audited metrics into an elite, printable PDF report.
-    Memory Optimization: Uses an in-memory byte buffer (io.BytesIO) to prevent 
-    disk I/O blocking and minimize memory footprint during concurrent generation.
-    """
-    logger.info(f"Generating PDF Sovereign Audit Report for property {property_id}")
-    
+def _sync_generate_audit_report(property_id: str) -> bytes:
     # Initialize in-memory buffer
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
@@ -98,3 +92,12 @@ async def generate_audit_report(pool, property_id: str) -> bytes:
     buffer.close()
     
     return pdf_bytes
+
+async def generate_audit_report(pool, property_id: str) -> bytes:
+    """
+    Compiles audited metrics into an elite, printable PDF report.
+    Memory Optimization: Uses an in-memory byte buffer (io.BytesIO).
+    CPU Optimization: Runs blocking ReportLab logic in a background thread.
+    """
+    logger.info(f"Generating PDF Sovereign Audit Report for property {property_id}")
+    return await asyncio.to_thread(_sync_generate_audit_report, property_id)

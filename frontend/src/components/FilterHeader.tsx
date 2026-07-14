@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { FilterState } from '@/types';
+import { FilterState } from '../types';
 
 interface FilterHeaderProps {
     filters: FilterState;

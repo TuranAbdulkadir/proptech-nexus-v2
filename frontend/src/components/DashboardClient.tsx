@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useCallback, useRef } from 'react';
 import { Property, PropertyExtended, FilterState } from '../types';
-import MapDashboard from './MapDashboard';
+import dynamic from 'next/dynamic';
+const MapDashboard = dynamic(() => import('./MapDashboard'), { ssr: false });
 import FilterHeader from './FilterHeader';
 import AuditSidebar from './AuditSidebar';
 
