@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardClient from '@/components/DashboardClient';
+import DashboardClient from '../../components/DashboardClient';
 
 export default async function DashboardPage() {
     // Server-side fetching for initial metrics payload.
