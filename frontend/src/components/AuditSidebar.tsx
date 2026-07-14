@@ -10,8 +10,18 @@ interface AuditSidebarProps {
 export default function AuditSidebar({ property, onClose }: AuditSidebarProps) {
     const [activeTab, setActiveTab] = useState<'financials' | 'threats' | 'climate' | 'ai'>('financials');
     const [isDownloading, setIsDownloading] = useState(false);
+    const [selectedDefect, setSelectedDefect] = useState<number | null>(null);
 
     if (!property) return null;
+
+    const REPAIR_COSTS: Record<string, { cost: string; roiImpact: string; action: string }> = {
+        "Structural Crack": { cost: "$12,500", roiImpact: "-0.8%", action: "Immediate epoxy injection and carbon fiber reinforcement required." },
+        "Water Damage": { cost: "$8,200", roiImpact: "-0.5%", action: "Waterproofing membrane installation and dehumidification cycle needed." },
+        "Mold Growth": { cost: "$6,800", roiImpact: "-0.4%", action: "Professional mold remediation and HVAC sanitization recommended." },
+        "Roof Sag": { cost: "$18,000", roiImpact: "-1.2%", action: "Structural truss replacement and load redistribution engineering." },
+        "Foundation Shift": { cost: "$35,000", roiImpact: "-2.5%", action: "Underpinning with helical piers. Immediate geotechnical assessment." },
+        "Electrical Fault": { cost: "$4,500", roiImpact: "-0.3%", action: "Complete rewiring of affected circuit. Arc-fault breaker installation." },
+    };
 
     const handleDownloadReport = async () => {
         try {
@@ -199,7 +209,6 @@ export default function AuditSidebar({ property, onClose }: AuditSidebarProps) {
                 
                 {activeTab === 'ai' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                        {/* Dynamic Bounding Box Image Canvas */}
                         <div className="relative w-full h-48 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-inner">
                             <img 
                                 src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800" 
@@ -207,13 +216,13 @@ export default function AuditSidebar({ property, onClose }: AuditSidebarProps) {
                                 className="object-cover w-full h-full opacity-80 mix-blend-luminosity"
                             />
                             
-                            {/* Overlay Gemini Bounding Boxes Dynamically */}
                             {property.structuralDefects.map((defect, i) => {
                                 const [ymin, xmin, ymax, xmax] = defect.box;
                                 return (
                                     <div 
                                         key={i}
-                                        className="absolute border-2 border-red-500 bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse"
+                                        onClick={() => setSelectedDefect(selectedDefect === i ? null : i)}
+                                        className={`absolute border-2 cursor-pointer transition-all ${selectedDefect === i ? 'border-yellow-400 bg-yellow-400/30 shadow-[0_0_25px_rgba(234,179,8,0.8)]' : 'border-red-500 bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse'}`}
                                         style={{
                                             top: `${ymin * 100}%`,
                                             left: `${xmin * 100}%`,
@@ -228,17 +237,51 @@ export default function AuditSidebar({ property, onClose }: AuditSidebarProps) {
                                 );
                             })}
 
-                            {/* Scan overlay effect */}
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/5 to-transparent animate-pulse"></div>
+                            <div className="absolute inset-0 pointer-events-none">
+                                <div className="scan-line-anim absolute left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/40 to-transparent"></div>
+                            </div>
                         </div>
+
+                        {selectedDefect !== null && property.structuralDefects[selectedDefect] && (
+                            <div className="p-4 bg-slate-800 rounded-xl border border-yellow-500/30 shadow-[0_0_20px_rgba(234,179,8,0.15)] animate-in fade-in duration-200">
+                                <div className="flex justify-between items-start mb-3">
+                                    <span className="text-yellow-400 font-bold text-sm uppercase tracking-wider">
+                                        {property.structuralDefects[selectedDefect].type}
+                                    </span>
+                                    <button onClick={() => setSelectedDefect(null)} className="text-slate-500 hover:text-white text-xs">✕</button>
+                                </div>
+                                <div className="space-y-2 text-xs font-mono">
+                                    <div className="flex justify-between py-1.5 border-b border-slate-700/50">
+                                        <span className="text-slate-500">Est. Repair Cost</span>
+                                        <span className="text-red-400 font-bold">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).cost}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1.5 border-b border-slate-700/50">
+                                        <span className="text-slate-500">Impact on ROI</span>
+                                        <span className="text-red-400 font-bold">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).roiImpact}</span>
+                                    </div>
+                                    <div className="flex justify-between py-1.5 border-b border-slate-700/50">
+                                        <span className="text-slate-500">AI Confidence</span>
+                                        <span className="text-yellow-400 font-bold">{(property.structuralDefects[selectedDefect].confidence * 100).toFixed(0)}%</span>
+                                    </div>
+                                </div>
+                                <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                    <span className="text-[9px] text-yellow-500 uppercase tracking-widest block mb-1">AI Recommended Action</span>
+                                    <p className="text-yellow-300 text-xs leading-relaxed">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).action}</p>
+                                </div>
+                            </div>
+                        )}
                         
                         <div className="space-y-2 text-sm font-mono mt-2">
                             {property.structuralDefects.length > 0 ? (
                                 property.structuralDefects.map((defect, i) => (
-                                    <div key={i} className="flex items-center gap-2 p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
-                                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                                        <span className="text-red-400 text-xs flex-1">{defect.type.toUpperCase()}</span>
-                                        <span className="text-red-300 text-xs font-bold">{(defect.confidence * 100).toFixed(0)}%</span>
+                                    <div 
+                                        key={i} 
+                                        onClick={() => setSelectedDefect(selectedDefect === i ? null : i)}
+                                        className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${selectedDefect === i ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-red-500/10 border border-red-500/20 hover:bg-red-500/20'}`}
+                                    >
+                                        <span className={`w-2 h-2 rounded-full ${selectedDefect === i ? 'bg-yellow-400' : 'bg-red-500 animate-pulse'}`}></span>
+                                        <span className={`text-xs flex-1 ${selectedDefect === i ? 'text-yellow-400' : 'text-red-400'}`}>{defect.type.toUpperCase()}</span>
+                                        <span className={`text-xs font-bold ${selectedDefect === i ? 'text-yellow-300' : 'text-red-300'}`}>{(defect.confidence * 100).toFixed(0)}%</span>
                                     </div>
                                 ))
                             ) : (
