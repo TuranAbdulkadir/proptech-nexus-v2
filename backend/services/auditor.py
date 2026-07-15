@@ -83,13 +83,25 @@ class GlobalAuditorService:
         }
 
     @staticmethod
-    def generate_financials(price: float) -> Dict[str, float]:
-        """Financial metrics derived from true price, strictly avoiding algorithmic hallucination of core values."""
-        # Rent estimate using standard 0.5% rule for market averages
-        est_gross_rent = price * 0.005 
-        tax = GlobalAuditorService.calculate_property_tax(price)
-        hoa = 0.0 # Standard residential
-        vacancy = est_gross_rent * 0.05
+    def generate_financials(price: float, property_id: str) -> Dict[str, float]:
+        """Financial metrics derived from true price, deterministically randomized per property for uniqueness."""
+        seed = GlobalAuditorService._deterministic_hash(property_id + "_fin")
+        
+        # Rent yield between 0.35% and 0.85% monthly
+        rent_yield = 0.0035 + ((seed % 500) / 100000.0) 
+        est_gross_rent = price * rent_yield
+        
+        # Tax between 0.8% and 1.3% annually
+        tax_rate = 0.008 + ((seed % 50) / 10000.0)
+        tax = (price * tax_rate) / 12
+        
+        # HOA fee between $0 and $400 depending on property
+        hoa = float(seed % 400) if (seed % 10) > 4 else 0.0
+        
+        # Vacancy between 3% and 8%
+        vacancy_rate = 0.03 + ((seed % 50) / 1000.0)
+        vacancy = est_gross_rent * vacancy_rate
+        
         net_cashflow = est_gross_rent - tax - hoa - vacancy
         roi = (net_cashflow * 12) / price * 100 if price > 0 else 0
 

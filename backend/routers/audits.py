@@ -25,7 +25,7 @@ async def _build_audit(property_id: str) -> Dict[str, Any]:
     # Fetch real crime density for this location
     crime_density = await auditor_service.fetch_real_crime_density(prop_info.get("latitude", 40.7), prop_info.get("longitude", -74.0))
 
-    financials = auditor_service.generate_financials(price)
+    financials = auditor_service.generate_financials(price, property_id)
     cyber = auditor_service.run_cyber_physical_scan(property_id, crime_density)
     climate = auditor_service.run_climate_hazard_scan(property_id)
 
