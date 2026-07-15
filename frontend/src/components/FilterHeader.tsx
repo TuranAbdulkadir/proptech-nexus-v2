@@ -5,9 +5,11 @@ import { FilterState } from "../types";
 interface FilterHeaderProps {
     filters: FilterState;
     onFilterChange: (filters: FilterState) => void;
+    onToggleList: () => void;
+    showingList: boolean;
 }
 
-export default function FilterHeader({ filters, onFilterChange }: FilterHeaderProps) {
+export default function FilterHeader({ filters, onFilterChange, onToggleList, showingList }: FilterHeaderProps) {
     const [expanded, setExpanded] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +55,13 @@ export default function FilterHeader({ filters, onFilterChange }: FilterHeaderPr
                             Hide Hazards
                         </label>
                     </div>
+
+                    <button
+                        onClick={onToggleList}
+                        className={`text-[9px] uppercase tracking-[0.15em] font-bold transition-colors px-3 py-1.5 rounded border ${showingList ? 'bg-green-500/20 text-green-400 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'text-slate-500 hover:text-green-400 border-slate-700/40 hover:border-green-500/30'}`}
+                    >
+                        {showingList ? "Hide List" : "Show List"}
+                    </button>
 
                     <button
                         onClick={() => setExpanded(!expanded)}

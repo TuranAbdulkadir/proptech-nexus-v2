@@ -4,10 +4,12 @@ import { PropertyExtended } from '../types';
 
 interface AuditSidebarProps {
     property: PropertyExtended | null;
+    borough: string;
+    imageUrl: string;
     onClose: () => void;
 }
 
-export default function AuditSidebar({ property, onClose }: AuditSidebarProps) {
+export default function AuditSidebar({ property, borough, imageUrl, onClose }: AuditSidebarProps) {
     const [activeTab, setActiveTab] = useState<'financials' | 'threats' | 'climate' | 'ai'>('financials');
     const [isDownloading, setIsDownloading] = useState(false);
     const [selectedDefect, setSelectedDefect] = useState<number | null>(null);
@@ -58,6 +60,7 @@ export default function AuditSidebar({ property, onClose }: AuditSidebarProps) {
             {/* Header */}
             <div className="p-6 border-b border-slate-800 flex justify-between items-start bg-gradient-to-r from-slate-900 to-slate-800">
                 <div className="flex-1 mr-4">
+                    <span className="text-[10px] text-green-400 uppercase tracking-widest font-bold mb-1 block">{borough}</span>
                     <h2 className="text-lg font-bold text-slate-100 leading-tight">{property.address}</h2>
                     <p className="text-slate-400 font-mono text-xs mt-1">
                         ${property.price.toLocaleString()} &bull; {property.sqft?.toLocaleString() || 'N/A'} sqft &bull; {property.bedrooms}BD / {property.bathrooms}BA
@@ -211,7 +214,7 @@ export default function AuditSidebar({ property, onClose }: AuditSidebarProps) {
                     <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                         <div className="relative w-full h-48 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-inner">
                             <img 
-                                src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800" 
+                                src={imageUrl} 
                                 alt="Property Visual Audit" 
                                 className="object-cover w-full h-full opacity-80 mix-blend-luminosity"
                             />
