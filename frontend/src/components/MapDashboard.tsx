@@ -39,12 +39,11 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
         if (map.current) return;
 
         map.current = L.map(mapContainer.current, {
-            center: [40.74, -73.97],
-            zoom: 12,
+            center: [47.54, -122.0], // Seattle / King County
+            zoom: 10,
             zoomControl: false,
             attributionControl: false,
-            maxBounds: [[40.45, -74.30], [40.95, -73.65]],
-            minZoom: 10,
+            minZoom: 9,
             maxZoom: 18,
         });
 
@@ -236,7 +235,7 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
                 </button>
 
                 <button
-                    onClick={() => { map.current?.setView([40.74, -73.97], 12, { animate: true }); }}
+                    onClick={() => { map.current?.setView([47.54, -122.0], 10, { animate: true }); }}
                     className="px-4 py-3 rounded-xl border bg-[#050505]/90 border-white/10 text-slate-500 text-[9px] uppercase tracking-[0.2em] font-bold hover:text-cyan-400 hover:border-cyan-500/30 transition-all shadow-xl backdrop-blur-3xl flex items-center justify-center gap-2"
                 >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
