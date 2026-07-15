@@ -115,7 +115,7 @@ class GlobalAuditorService:
             return nyc_data_cache[cache_key]
 
         from urllib.parse import quote
-        query = "assesstot > 500000 AND latitude IS NOT NULL"
+        query = "assesstot > 500000 AND assesstot < 100000000 AND latitude IS NOT NULL"
         url = f"https://data.cityofnewyork.us/resource/64uk-42ks.json?$where={quote(query)}&$limit={limit}&$order=assesstot%20DESC"
         
         async with httpx.AsyncClient(timeout=10.0) as client:

@@ -199,7 +199,7 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
                 <div className="bg-slate-900/85 backdrop-blur-xl border border-slate-700/40 rounded-xl px-3 py-2 text-center shadow-xl">
                     <span className="text-[8px] text-slate-600 uppercase tracking-[0.15em] block">Active Nodes</span>
                     <span className="text-2xl font-bold text-green-400 font-mono leading-tight">{properties.length}</span>
-                    <span className="text-[8px] text-slate-600 block">of 48 indexed</span>
+                    <span className="text-[8px] text-slate-600 block">in view</span>
                 </div>
 
                 <button
