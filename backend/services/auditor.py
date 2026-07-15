@@ -123,39 +123,48 @@ class GlobalAuditorService:
                 response = await client.get(url)
                 response.raise_for_status()
                 data = response.json()
-                
-                properties = []
-                for item in data:
-                    try:
-                        bbl = item.get("bbl")
-                        if not bbl: continue
-                        
-                        price = float(item.get("assesstot", 0)) * 2
-                        sqft = int(item.get("bldgarea", 0))
-                        if sqft == 0: sqft = int(item.get("lotarea", 0))
-                        
-                        if price < 100000 or sqft < 200: continue
-                        
-                        properties.append({
-                            "id": f"nyc-{bbl}",
-                            "bbl": bbl,
-                            "address": item.get("address", "Unknown Address").title(),
-                            "borough": item.get("borough", "NYC").title(),
-                            "latitude": float(item.get("latitude")),
-                            "longitude": float(item.get("longitude")),
-                            "price": round(price),
-                            "sqft": sqft,
-                            "bedrooms": max(1, sqft // 800),
-                            "bathrooms": max(1, sqft // 1200)
-                        })
-                    except (ValueError, TypeError):
-                        continue
-                
-                nyc_data_cache[cache_key] = properties
-                return properties
             except Exception as e:
-                print(f"[SYSTEM ERROR] PLUTO Fetch Failed: {e}")
-                return []
+                print(f"[SYSTEM WARNING] PLUTO Live Fetch Failed ({e}). Falling back to static real-data snapshot.")
+                import json, os
+                snapshot_path = os.path.join(os.path.dirname(__file__), 'pluto_snapshot.json')
+                try:
+                    with open(snapshot_path, 'r') as f:
+                        data = json.load(f)
+                except Exception as inner_e:
+                    print(f"[SYSTEM ERROR] Snapshot also failed: {inner_e}")
+                    return []
+                
+            properties = []
+            for item in data:
+                try:
+                    bbl = item.get("bbl")
+                    if not bbl: continue
+                    
+                    price = float(item.get("assesstot", 0)) * 2
+                    sqft = int(item.get("bldgarea", 0))
+                    if sqft == 0: sqft = int(item.get("lotarea", 0))
+                    
+                    if price < 100000 or sqft < 200: continue
+                    
+                    properties.append({
+                        "id": f"nyc-{bbl}",
+                        "bbl": bbl,
+                        "address": item.get("address", "Unknown Address").title(),
+                        "borough": item.get("borough", "NYC").title(),
+                        "latitude": float(item.get("latitude")),
+                        "longitude": float(item.get("longitude")),
+                        "price": round(price),
+                        "sqft": sqft,
+                        "bedrooms": max(1, sqft // 800),
+                        "bathrooms": max(1, sqft // 1200)
+                    })
+                except (ValueError, TypeError):
+                    continue
+            
+            # Limit properties just in case snapshot has too many
+            properties = properties[:limit]
+            nyc_data_cache[cache_key] = properties
+            return properties
 
     @staticmethod
     async def fetch_real_crime_density(lat: float, lon: float) -> int:
