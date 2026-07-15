@@ -48,5 +48,5 @@ async def search_properties_bbox(
                 
         return properties
     except Exception as e:
-        logger.error(f"Error fetching real properties: {e}")
-        raise HTTPException(status_code=500, detail="Error fetching real spatial data")
+        logger.error(f"Error fetching real properties: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")

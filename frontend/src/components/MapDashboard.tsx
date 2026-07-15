@@ -207,7 +207,6 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
 
             <style jsx global>{`
                 .leaflet-container { background: #020202 !important; }
-                .leaflet-layer { filter: brightness(0.6) contrast(1.5) sepia(0.2) hue-rotate(180deg) saturate(0.5); }
                 .cyber-tooltip { background: transparent !important; border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
                 .cyber-tooltip::before { display: none !important; }
                 
