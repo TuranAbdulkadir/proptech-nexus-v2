@@ -12,7 +12,7 @@ class PropertyResponse(BaseModel):
     price: float
     sqft: float
     bedrooms: int
-    bathrooms: int
+    bathrooms: float
     latitude: float
     longitude: float
 
