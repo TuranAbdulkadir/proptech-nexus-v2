@@ -35,9 +35,9 @@ export default function PropertyList({ properties, selectedId, searchQuery, onSe
             </div>
 
             <div className="flex-1 overflow-y-auto p-2 space-y-1.5" style={{ scrollbarWidth: "thin", scrollbarColor: "#334155 transparent" }}>
-                {properties.map((prop) => {
+                {properties.map((prop: any) => {
                     const isSelected = selectedId === prop.id;
-                    const borough = boroughs[prop.address] || "NYC";
+                    const borough = prop.borough || boroughs[prop.address] || "NYC";
                     return (
                         <div
                             key={prop.id}

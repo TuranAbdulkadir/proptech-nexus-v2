@@ -27,45 +27,26 @@ async def search_properties_bbox(
     """
     Perform a geospatial bounding box search using PostGIS ST_MakeEnvelope and ST_Contains.
     """
-    pool = request.app.state.db_pool
-    if not pool:
-        raise HTTPException(status_code=500, detail="Database pool not initialized")
-
-    query = """
-        SELECT 
-            id, 
-            address, 
-            price, 
-            sqft, 
-            bedrooms, 
-            bathrooms,
-            ST_X(geom::geometry) as longitude,
-            ST_Y(geom::geometry) as latitude
-        FROM properties
-        WHERE ST_Contains(
-            ST_MakeEnvelope($1, $2, $3, $4, 4326),
-            geom::geometry
-        );
-    """
-    
     try:
-        async with pool.acquire() as conn:
-            records = await conn.fetch(query, min_lon, min_lat, max_lon, max_lat)
-            
+        from services.auditor import auditor_service
+        all_properties = await auditor_service.fetch_real_properties(limit=200)
+        
+        # Filter by bounding box manually
         properties = []
-        for record in records:
-            properties.append(PropertyResponse(
-                id=str(record['id']),
-                address=record['address'],
-                price=float(record['price']),
-                sqft=float(record['sqft']),
-                bedrooms=record['bedrooms'],
-                bathrooms=record['bathrooms'],
-                latitude=float(record['latitude']),
-                longitude=float(record['longitude'])
-            ))
-            
+        for p in all_properties:
+            if (min_lon <= p['longitude'] <= max_lon) and (min_lat <= p['latitude'] <= max_lat):
+                properties.append(PropertyResponse(
+                    id=p['id'],
+                    address=p['address'],
+                    price=p['price'],
+                    sqft=p['sqft'],
+                    bedrooms=p['bedrooms'],
+                    bathrooms=p['bathrooms'],
+                    latitude=p['latitude'],
+                    longitude=p['longitude']
+                ))
+                
         return properties
     except Exception as e:
-        logger.error(f"Error executing PostGIS query: {e}")
-        raise HTTPException(status_code=500, detail="Error fetching spatial data")
+        logger.error(f"Error fetching real properties: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching real spatial data")

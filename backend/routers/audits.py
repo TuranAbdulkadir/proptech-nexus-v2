@@ -11,33 +11,28 @@ from services.pdf_generator import generate_audit_pdf
 router = APIRouter(prefix="/audits", tags=["Audits"])
 logger = logging.getLogger(__name__)
 
-# Mock price and address store — in production this queries the `properties` table
-MOCK_PROPERTIES = {
-    "prop-1": {"price": 5500000, "address": "Wall Street Tower Alpha"},
-    "prop-2": {"price": 12500000, "address": "Times Square Penthouse"},
-    "prop-3": {"price": 8000000, "address": "Empire Sector Node"},
-    "prop-4": {"price": 1200000, "address": "Cyber Node Alpha"},
-    "prop-5": {"price": 2500000, "address": "Neon Heights"},
-    "prop-6": {"price": 800000, "address": "Grid Sector 7"},
-    "prop-7": {"price": 18000000, "address": "Financial District Hub"},
-    "prop-8": {"price": 9500000, "address": "MoMA Sky-Loft"},
-    "prop-9": {"price": 3400000, "address": "Pace University Node"},
-    "prop-10": {"price": 4200000, "address": "Union Square Condo"},
-    "prop-11": {"price": 6700000, "address": "SoHo Art District Hub"},
-}
-
-
-def _build_audit(property_id: str) -> Dict[str, Any]:
-    """Internal helper to build the full audit payload."""
-    prop_info = MOCK_PROPERTIES.get(property_id, {"price": 2000000, "address": "Unknown Property"})
+async def _build_audit(property_id: str) -> Dict[str, Any]:
+    """Internal helper to build the full audit payload using real NYC data."""
+    # Find property in our cached real data
+    all_properties = await auditor_service.fetch_real_properties(limit=200)
+    prop_info = next((p for p in all_properties if p["id"] == property_id), None)
+    
+    if not prop_info:
+        prop_info = {"price": 2000000, "address": "Unknown NYC Property", "latitude": 40.7, "longitude": -74.0}
+        
     price = prop_info["price"]
+    
+    # Fetch real crime density for this location
+    crime_density = await auditor_service.fetch_real_crime_density(prop_info.get("latitude", 40.7), prop_info.get("longitude", -74.0))
 
     financials = auditor_service.generate_financials(price)
-    cyber = auditor_service.run_cyber_physical_scan(property_id)
+    cyber = auditor_service.run_cyber_physical_scan(property_id, crime_density)
     climate = auditor_service.run_climate_hazard_scan(property_id)
 
-    # Simulate Gemini AI structural defect detection
-    random.seed(sum(ord(c) for c in property_id) + 2)
+    # Deterministic defects simulation based on hash (because we don't have real structural defects for all NYC buildings)
+    import hashlib
+    seed_val = int(hashlib.sha256(property_id.encode('utf-8')).hexdigest()[:8], 16)
+    random.seed(seed_val + 2)
     defects = []
     if random.random() > 0.4:
         num_defects = random.randint(1, 3)
@@ -65,7 +60,7 @@ async def get_property_audit(property_id: str) -> Dict[str, Any]:
     """
     Aggregates financial, cyber-security, and climate intelligence for a property.
     """
-    return _build_audit(property_id)
+    return await _build_audit(property_id)
 
 
 @router.get("/{property_id}/pdf")
@@ -73,7 +68,7 @@ async def download_audit_pdf(property_id: str):
     """
     Generates and streams a professional Sovereign Audit PDF report.
     """
-    audit = _build_audit(property_id)
+    audit = await _build_audit(property_id)
     address = audit.pop("address", "Unknown")
 
     # Run the CPU-bound PDF generation in a thread pool to avoid blocking the event loop
