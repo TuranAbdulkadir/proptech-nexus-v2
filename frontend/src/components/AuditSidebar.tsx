@@ -35,7 +35,7 @@ export default function AuditSidebar({ property, borough, imageUrl, onClose }: A
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `PropTech_Sovereign_Audit_${property.id}.pdf`;
+                a.download = `PropTech_Sentinel_Audit_${property.id}.pdf`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
@@ -50,34 +50,42 @@ export default function AuditSidebar({ property, borough, imageUrl, onClose }: A
         }
     };
 
-    // Determine color coding for scores
-    const securityColor = property.securityScore >= 70 ? 'text-green-400' : property.securityScore >= 40 ? 'text-yellow-400' : 'text-red-400';
-    const roiColor = property.annualizedRoi >= 6 ? 'text-green-400' : property.annualizedRoi >= 3 ? 'text-yellow-400' : 'text-red-400';
-    const cashflowColor = property.netCashflow >= 0 ? 'text-green-400' : 'text-red-400';
+    const securityColor = property.securityScore >= 70 ? 'text-emerald-400' : property.securityScore >= 40 ? 'text-yellow-400' : 'text-red-400';
+    const roiColor = property.annualizedRoi >= 6 ? 'text-cyan-400' : property.annualizedRoi >= 3 ? 'text-yellow-400' : 'text-red-400';
+    const cashflowColor = property.netCashflow >= 0 ? 'text-cyan-400' : 'text-red-400';
 
     return (
-        <aside className="absolute top-0 right-0 h-full w-[420px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.8)] z-20 flex flex-col transform transition-transform duration-300 ease-in-out overflow-hidden">
+        <aside className="absolute top-0 right-0 h-full w-[450px] bg-[#020202]/90 backdrop-blur-3xl border-l border-white/5 shadow-[-20px_0_50px_rgba(0,0,0,0.8)] z-20 flex flex-col transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-cyan-500/5 to-transparent h-40"></div>
+            
             {/* Header */}
-            <div className="p-6 border-b border-slate-800 flex justify-between items-start bg-gradient-to-r from-slate-900 to-slate-800">
+            <div className="p-8 pb-6 border-b border-white/5 flex justify-between items-start relative z-10">
                 <div className="flex-1 mr-4">
-                    <span className="text-[10px] text-green-400 uppercase tracking-widest font-bold mb-1 block">{borough}</span>
-                    <h2 className="text-lg font-bold text-slate-100 leading-tight">{property.address}</h2>
-                    <p className="text-slate-400 font-mono text-xs mt-1">
-                        ${property.price.toLocaleString()} &bull; {property.sqft?.toLocaleString() || 'N/A'} sqft &bull; {property.bedrooms}BD / {property.bathrooms}BA
+                    <span className="text-[10px] text-cyan-400 uppercase tracking-[0.3em] font-bold mb-2 block flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(0,229,255,1)]"></span>
+                        {borough}
+                    </span>
+                    <h2 className="text-2xl font-bold text-white leading-tight tracking-wide">{property.address}</h2>
+                    <p className="text-slate-400 font-mono text-xs mt-2 flex items-center gap-2">
+                        <span className="text-cyan-100">${property.price.toLocaleString()}</span>
+                        <span className="text-white/20">|</span>
+                        <span>{property.sqft?.toLocaleString() || 'N/A'} SQFT</span>
+                        <span className="text-white/20">|</span>
+                        <span>{property.bedrooms}B/{property.bathrooms}B</span>
                     </p>
-                    <div className="flex gap-2 mt-3">
-                        <ScoreBadge label="OPPORTUNITY" value={property.opportunityScore} max={10} color="green" />
-                        <ScoreBadge label="SECURITY" value={property.securityScore} max={100} color={property.securityScore >= 70 ? 'green' : property.securityScore >= 40 ? 'yellow' : 'red'} />
-                        <ScoreBadge label="HAZARD" value={property.hazardScore} max={100} color={property.hazardScore <= 30 ? 'green' : property.hazardScore <= 60 ? 'yellow' : 'red'} />
+                    <div className="flex gap-3 mt-5">
+                        <ScoreBadge label="OPPORTUNITY" value={property.opportunityScore} max={10} color="cyan" />
+                        <ScoreBadge label="SECURITY" value={property.securityScore} max={100} color={property.securityScore >= 70 ? 'emerald' : property.securityScore >= 40 ? 'yellow' : 'red'} />
+                        <ScoreBadge label="HAZARD" value={property.hazardScore} max={100} color={property.hazardScore <= 30 ? 'emerald' : property.hazardScore <= 60 ? 'yellow' : 'red'} />
                     </div>
                 </div>
-                <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors p-1 hover:bg-slate-700 rounded">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button onClick={onClose} className="text-slate-500 hover:text-cyan-400 transition-colors p-2 hover:bg-white/5 rounded-full backdrop-blur-md border border-transparent hover:border-white/10">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
             {/* Tabs */}
-            <div className="flex bg-slate-800/50">
+            <div className="flex bg-black/40 border-b border-white/5 relative z-10">
                 <TabButton active={activeTab === 'financials'} onClick={() => setActiveTab('financials')} label="Financials" icon="💰" />
                 <TabButton active={activeTab === 'threats'} onClick={() => setActiveTab('threats')} label="Threats" icon="🛡️" />
                 <TabButton active={activeTab === 'climate'} onClick={() => setActiveTab('climate')} label="Hazards" icon="🌊" />
@@ -85,89 +93,96 @@ export default function AuditSidebar({ property, borough, imageUrl, onClose }: A
             </div>
 
             {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-5 text-slate-200">
+            <div className="flex-1 overflow-y-auto p-6 text-slate-200 relative z-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {activeTab === 'financials' && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-800 to-slate-800/50 rounded-xl border border-green-500/30 shadow-[0_0_20px_rgba(34,197,94,0.1)]">
+                    <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                        <div className="flex items-center justify-between p-5 bg-gradient-to-br from-black to-[#050505] rounded-xl border border-cyan-500/20 shadow-[0_0_30px_rgba(0,229,255,0.05)] relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                             <div>
-                                <span className="text-slate-500 text-[10px] uppercase tracking-widest block">Net Cashflow / Month</span>
-                                <span className={`text-2xl font-bold ${cashflowColor}`}>${property.netCashflow.toFixed(2)}</span>
+                                <span className="text-slate-500 text-[9px] uppercase tracking-[0.2em] block">Net Cashflow / Month</span>
+                                <span className={`text-3xl font-light tracking-tight mt-1 block ${cashflowColor}`}>${property.netCashflow.toFixed(2)}</span>
                             </div>
                             <div className="text-right">
-                                <span className="text-slate-500 text-[10px] uppercase tracking-widest block">Annual ROI</span>
-                                <span className={`text-2xl font-bold ${roiColor}`}>{property.annualizedRoi.toFixed(2)}%</span>
+                                <span className="text-slate-500 text-[9px] uppercase tracking-[0.2em] block">Annual ROI</span>
+                                <span className={`text-3xl font-light tracking-tight mt-1 block ${roiColor}`}>{property.annualizedRoi.toFixed(2)}%</span>
                             </div>
                         </div>
-                        <div className="space-y-1 text-sm font-mono">
-                            <Row label="Gross Rent" value={`$${property.grossRent.toFixed(2)}`} valueColor="text-green-400" />
+
+                        <div className="space-y-1.5 text-xs font-mono bg-black/30 p-4 rounded-xl border border-white/5">
+                            <Row label="Gross Rent" value={`$${property.grossRent.toFixed(2)}`} valueColor="text-emerald-400" />
                             <Row label="Property Tax (NYC)" value={`-$${property.propertyTax.toFixed(2)}`} valueColor="text-red-400" />
                             <Row label="HOA Fee" value={`-$${property.hoaFee.toFixed(2)}`} valueColor="text-red-400" />
                             <Row label="Vacancy Buffer (5%)" value={`-$${property.vacancyBuffer.toFixed(2)}`} valueColor="text-red-400" />
                         </div>
 
-                        {/* Price Per Sqft */}
-                        <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700 mt-3">
-                            <div className="flex justify-between items-center">
-                                <span className="text-slate-500 text-xs uppercase tracking-wider">Price per sqft</span>
-                                <span className="text-slate-100 font-bold font-mono">${property.sqft ? (property.price / property.sqft).toFixed(0) : 'N/A'}</span>
+                        <div className="p-4 bg-black/30 rounded-xl border border-white/5">
+                            <div className="flex justify-between items-center py-1">
+                                <span className="text-slate-500 text-[10px] uppercase tracking-[0.2em]">Price per sqft</span>
+                                <span className="text-cyan-50 font-mono">${property.sqft ? (property.price / property.sqft).toFixed(0) : 'N/A'}</span>
                             </div>
-                            <div className="flex justify-between items-center mt-2">
-                                <span className="text-slate-500 text-xs uppercase tracking-wider">Monthly per sqft</span>
-                                <span className="text-slate-100 font-bold font-mono">${property.sqft ? (property.grossRent / property.sqft).toFixed(2) : 'N/A'}</span>
+                            <div className="flex justify-between items-center py-1">
+                                <span className="text-slate-500 text-[10px] uppercase tracking-[0.2em]">Monthly per sqft</span>
+                                <span className="text-cyan-50 font-mono">${property.sqft ? (property.grossRent / property.sqft).toFixed(2) : 'N/A'}</span>
                             </div>
                         </div>
                         
                         <button 
                             onClick={handleDownloadReport} 
                             disabled={isDownloading}
-                            className="w-full mt-4 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-slate-950 font-bold rounded-lg shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all uppercase tracking-widest text-xs flex justify-center items-center disabled:opacity-50 active:scale-95"
+                            className="w-full mt-6 py-4 bg-black border border-cyan-500/50 hover:bg-cyan-950/30 text-cyan-400 font-bold rounded-xl shadow-[0_0_20px_rgba(0,229,255,0.15)] hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all uppercase tracking-[0.2em] text-[10px] flex justify-center items-center disabled:opacity-50 active:scale-95 group relative overflow-hidden"
                         >
+                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             {isDownloading ? (
-                                <span className="flex items-center gap-2">
-                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    Generating Sovereign Audit...
+                                <span className="flex items-center gap-3 relative z-10">
+                                    <svg className="animate-spin h-4 w-4 text-cyan-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    EXECUTING NEURAL EXPORT...
                                 </span>
-                            ) : "⬇ Download Audit Report (PDF)"}
+                            ) : (
+                                <span className="flex items-center gap-2 relative z-10">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    INITIATE AUDIT EXTRACTION
+                                </span>
+                            )}
                         </button>
                     </div>
                 )}
                 
                 {activeTab === 'threats' && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                        {/* Security Score Gauge */}
-                        <div className="p-4 bg-slate-800 rounded-xl border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-                            <div className="flex justify-between items-center mb-3">
-                                <span className="text-slate-400 text-xs uppercase tracking-wider">Cyber-Physical Security Score</span>
-                                <span className={`font-bold font-mono ${securityColor}`}>{property.securityScore}/100</span>
+                    <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                        <div className="p-5 bg-black/40 rounded-xl border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.05)]">
+                            <div className="flex justify-between items-center mb-4">
+                                <span className="text-slate-400 text-[9px] uppercase tracking-[0.2em]">Cyber-Physical Security Core</span>
+                                <span className={`font-mono text-lg ${securityColor}`}>{property.securityScore}<span className="text-xs text-slate-600">/100</span></span>
                             </div>
-                            <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                            <div className="w-full bg-black border border-white/5 rounded-full h-1.5 overflow-hidden">
                                 <div 
-                                    className={`h-3 rounded-full transition-all duration-1000 ${property.securityScore >= 70 ? 'bg-green-500' : property.securityScore >= 40 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                    className={`h-full transition-all duration-1000 ${property.securityScore >= 70 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]' : property.securityScore >= 40 ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]'}`}
                                     style={{ width: `${property.securityScore}%` }}
                                 ></div>
                             </div>
                         </div>
 
-                        <div className="space-y-1 text-sm font-mono">
-                            <Row label="Crime Index" value={property.crimeIndex.toString()} valueColor={property.crimeIndex > 50 ? 'text-red-400' : 'text-green-400'} />
-                            <Row label="Distance to Police" value={`${property.distanceToPolice} mi`} valueColor={property.distanceToPolice > 2 ? 'text-yellow-400' : 'text-green-400'} />
+                        <div className="space-y-1.5 text-xs font-mono bg-black/30 p-4 rounded-xl border border-white/5">
+                            <Row label="Nypd Crime Index" value={property.crimeIndex.toString()} valueColor={property.crimeIndex > 50 ? 'text-red-400' : 'text-emerald-400'} />
+                            <Row label="Distance to Police" value={`${property.distanceToPolice} mi`} valueColor={property.distanceToPolice > 2 ? 'text-yellow-400' : 'text-emerald-400'} />
                         </div>
 
-                        {/* Open Ports Table */}
-                        <div className="mt-3">
-                            <span className="text-slate-500 text-[10px] uppercase tracking-widest block mb-2">Detected Open IoT Ports (Shodan/Censys)</span>
+                        <div className="mt-4 p-4 bg-black/30 rounded-xl border border-white/5">
+                            <span className="text-slate-500 text-[9px] uppercase tracking-[0.2em] block mb-3">IoT Vulnerability Scan (Shodan)</span>
                             {property.openIotPorts.length > 0 ? (
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     {property.openIotPorts.map((port, i) => (
-                                        <div key={i} className="flex items-center gap-2 p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
-                                            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                                            <span className="text-red-400 text-xs font-mono">{port}</span>
+                                        <div key={i} className="flex items-center gap-3 p-2.5 bg-red-950/20 border border-red-500/20 rounded-lg group hover:border-red-500/40 transition-colors">
+                                            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,1)]"></span>
+                                            <span className="text-red-400 text-xs font-mono tracking-widest">{port}</span>
+                                            <span className="ml-auto text-[8px] text-red-500/50 uppercase tracking-widest group-hover:text-red-400/80">Exposed</span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                                    <span className="text-green-400 text-xs font-mono">✓ No vulnerable ports detected</span>
+                                <div className="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-lg flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span className="text-emerald-400 text-[10px] uppercase tracking-[0.2em]">Secure - No vulnerable nodes</span>
                                 </div>
                             )}
                         </div>
@@ -175,35 +190,35 @@ export default function AuditSidebar({ property, borough, imageUrl, onClose }: A
                 )}
                 
                 {activeTab === 'climate' && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                        <div className="p-4 bg-slate-800 rounded-xl border border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
-                            <span className="text-slate-400 block mb-1 text-[10px] uppercase tracking-widest">FEMA Flood Zone Classification</span>
-                            <span className={`text-xl font-bold ${property.floodZone.includes('High') || property.floodZone.includes('Coastal') ? 'text-red-400' : property.floodZone.includes('Moderate') ? 'text-yellow-400' : 'text-green-400'}`}>
+                    <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                        <div className="p-5 bg-black/40 rounded-xl border border-yellow-500/20 shadow-[0_0_20px_rgba(234,179,8,0.05)]">
+                            <span className="text-slate-400 block mb-2 text-[9px] uppercase tracking-[0.2em]">FEMA Flood Zone</span>
+                            <span className={`text-xl font-light tracking-wide ${property.floodZone.includes('High') || property.floodZone.includes('Coastal') ? 'text-red-400' : property.floodZone.includes('Moderate') ? 'text-yellow-400' : 'text-emerald-400'}`}>
                                 {property.floodZone}
                             </span>
                         </div>
 
-                        <div className="p-4 bg-slate-800 rounded-xl border border-slate-700">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-slate-400 text-xs uppercase tracking-wider">Seismic Safety</span>
-                                <span className={`font-bold font-mono ${property.seismicSafety >= 70 ? 'text-green-400' : property.seismicSafety >= 40 ? 'text-yellow-400' : 'text-red-400'}`}>{property.seismicSafety}/100</span>
+                        <div className="p-5 bg-black/40 rounded-xl border border-white/5">
+                            <div className="flex justify-between items-center mb-4">
+                                <span className="text-slate-400 text-[9px] uppercase tracking-[0.2em]">Seismic Integrity Rating</span>
+                                <span className={`font-mono text-lg ${property.seismicSafety >= 70 ? 'text-emerald-400' : property.seismicSafety >= 40 ? 'text-yellow-400' : 'text-red-400'}`}>{property.seismicSafety}<span className="text-xs text-slate-600">/100</span></span>
                             </div>
-                            <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                            <div className="w-full bg-black border border-white/5 rounded-full h-1.5 overflow-hidden">
                                 <div 
-                                    className={`h-3 rounded-full transition-all duration-1000 ${property.seismicSafety >= 70 ? 'bg-green-500' : property.seismicSafety >= 40 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                    className={`h-full transition-all duration-1000 ${property.seismicSafety >= 70 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]' : property.seismicSafety >= 40 ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.8)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]'}`}
                                     style={{ width: `${property.seismicSafety}%` }}
                                 ></div>
                             </div>
                         </div>
 
-                        {/* Risk Summary */}
-                        <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                            <span className="text-slate-500 text-[10px] uppercase tracking-widest block mb-2">Risk Assessment Summary</span>
-                            <div className="text-xs text-slate-300 leading-relaxed">
+                        <div className="p-4 bg-black/30 rounded-xl border border-white/5 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                            <span className="text-slate-500 text-[9px] uppercase tracking-[0.2em] block mb-2 ml-2">Risk Assessment Vector</span>
+                            <div className="text-[11px] text-slate-400 leading-relaxed ml-2 font-mono">
                                 {property.floodZone.includes('High') || property.floodZone.includes('Coastal') ? (
-                                    <p className="text-red-400">⚠ This property is located in a high-risk flood zone. Flood insurance will be mandatory and may significantly impact investment returns.</p>
+                                    <p className="text-red-300/80">⚠ CRITICAL: High-risk inundation zone detected. Mandatory flood insurance protocols active. Expected ROI degradation likely.</p>
                                 ) : (
-                                    <p className="text-green-400">✓ This property is in a low to moderate flood risk zone. Standard homeowner insurance should suffice.</p>
+                                    <p className="text-emerald-300/80">✓ CLEAR: Moderate-to-low inundation probability. Standard protective protocols suffice. No anomalous risk modifiers applied.</p>
                                 )}
                             </div>
                         </div>
@@ -211,13 +226,14 @@ export default function AuditSidebar({ property, borough, imageUrl, onClose }: A
                 )}
                 
                 {activeTab === 'ai' && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                        <div className="relative w-full h-48 bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-inner">
+                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                        <div className="relative w-full h-56 bg-black rounded-xl overflow-hidden border border-white/10 shadow-[0_0_30px_rgba(0,0,0,1)]">
                             <img 
                                 src={imageUrl} 
                                 alt="Property Visual Audit" 
-                                className="object-cover w-full h-full opacity-80 mix-blend-luminosity"
+                                className="object-cover w-full h-full opacity-60 mix-blend-luminosity grayscale contrast-125"
                             />
+                            <div className="absolute inset-0 bg-cyan-900/10 mix-blend-color"></div>
                             
                             {property.structuralDefects.map((defect, i) => {
                                 const [ymin, xmin, ymax, xmax] = defect.box;
@@ -225,7 +241,7 @@ export default function AuditSidebar({ property, borough, imageUrl, onClose }: A
                                     <div 
                                         key={i}
                                         onClick={() => setSelectedDefect(selectedDefect === i ? null : i)}
-                                        className={`absolute border-2 cursor-pointer transition-all ${selectedDefect === i ? 'border-yellow-400 bg-yellow-400/30 shadow-[0_0_25px_rgba(234,179,8,0.8)]' : 'border-red-500 bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-pulse'}`}
+                                        className={`absolute border cursor-pointer transition-all duration-300 ${selectedDefect === i ? 'border-cyan-400 bg-cyan-400/20 shadow-[0_0_20px_rgba(0,229,255,0.6)]' : 'border-red-500 bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.4)]'}`}
                                         style={{
                                             top: `${ymin * 100}%`,
                                             left: `${xmin * 100}%`,
@@ -233,84 +249,103 @@ export default function AuditSidebar({ property, borough, imageUrl, onClose }: A
                                             width: `${(xmax - xmin) * 100}%`,
                                         }}
                                     >
-                                        <span className="absolute -top-5 left-0 text-[8px] uppercase font-bold bg-red-500 text-white px-1 tracking-widest whitespace-nowrap rounded-sm">
-                                            {defect.type} ({(defect.confidence * 100).toFixed(0)}%)
+                                        <div className="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-current"></div>
+                                        <div className="absolute -top-1 -right-1 w-2 h-2 border-t border-r border-current"></div>
+                                        <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b border-l border-current"></div>
+                                        <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b border-r border-current"></div>
+                                        <span className={`absolute -top-6 left-0 text-[7px] uppercase font-bold px-1.5 py-0.5 tracking-widest whitespace-nowrap rounded-sm backdrop-blur-md ${selectedDefect === i ? 'bg-cyan-500/80 text-black' : 'bg-red-500/80 text-white'}`}>
+                                            {defect.type} // {(defect.confidence * 100).toFixed(0)}%
                                         </span>
                                     </div>
                                 );
                             })}
 
                             <div className="absolute inset-0 pointer-events-none">
-                                <div className="scan-line-anim absolute left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/40 to-transparent"></div>
+                                <div className="w-full h-full bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-20"></div>
+                                <div className="absolute top-0 left-0 w-full h-1 bg-cyan-500/40 shadow-[0_0_20px_rgba(0,229,255,1)] animate-[scan_3s_linear_infinite]"></div>
                             </div>
                         </div>
 
                         {selectedDefect !== null && property.structuralDefects[selectedDefect] && (
-                            <div className="p-4 bg-slate-800 rounded-xl border border-yellow-500/30 shadow-[0_0_20px_rgba(234,179,8,0.15)] animate-in fade-in duration-200">
-                                <div className="flex justify-between items-start mb-3">
-                                    <span className="text-yellow-400 font-bold text-sm uppercase tracking-wider">
+                            <div className="p-5 bg-[#050505] rounded-xl border border-cyan-500/30 shadow-[0_0_30px_rgba(0,229,255,0.1)] animate-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-start mb-4">
+                                    <span className="text-cyan-400 font-bold text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                         {property.structuralDefects[selectedDefect].type}
                                     </span>
-                                    <button onClick={() => setSelectedDefect(null)} className="text-slate-500 hover:text-white text-xs">✕</button>
+                                    <button onClick={() => setSelectedDefect(null)} className="text-slate-600 hover:text-white transition-colors">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
                                 </div>
-                                <div className="space-y-2 text-xs font-mono">
-                                    <div className="flex justify-between py-1.5 border-b border-slate-700/50">
-                                        <span className="text-slate-500">Est. Repair Cost</span>
-                                        <span className="text-red-400 font-bold">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).cost}</span>
+                                <div className="space-y-1.5 text-xs font-mono">
+                                    <div className="flex justify-between py-1.5 border-b border-white/5">
+                                        <span className="text-slate-500">Est. Protocol Cost</span>
+                                        <span className="text-red-400">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).cost}</span>
                                     </div>
-                                    <div className="flex justify-between py-1.5 border-b border-slate-700/50">
-                                        <span className="text-slate-500">Impact on ROI</span>
-                                        <span className="text-red-400 font-bold">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).roiImpact}</span>
+                                    <div className="flex justify-between py-1.5 border-b border-white/5">
+                                        <span className="text-slate-500">Vector Impact (ROI)</span>
+                                        <span className="text-red-400">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).roiImpact}</span>
                                     </div>
-                                    <div className="flex justify-between py-1.5 border-b border-slate-700/50">
-                                        <span className="text-slate-500">AI Confidence</span>
-                                        <span className="text-yellow-400 font-bold">{(property.structuralDefects[selectedDefect].confidence * 100).toFixed(0)}%</span>
+                                    <div className="flex justify-between py-1.5 border-b border-white/5">
+                                        <span className="text-slate-500">Neural Confidence</span>
+                                        <span className="text-cyan-400">{(property.structuralDefects[selectedDefect].confidence * 100).toFixed(0)}%</span>
                                     </div>
                                 </div>
-                                <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                                    <span className="text-[9px] text-yellow-500 uppercase tracking-widest block mb-1">AI Recommended Action</span>
-                                    <p className="text-yellow-300 text-xs leading-relaxed">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).action}</p>
+                                <div className="mt-4 p-3 bg-cyan-950/20 border border-cyan-500/20 rounded-lg">
+                                    <span className="text-[8px] text-cyan-500 uppercase tracking-[0.2em] block mb-1.5 font-bold">Recommended Sentinel Action</span>
+                                    <p className="text-slate-300 text-[10px] leading-relaxed font-mono">{(REPAIR_COSTS[property.structuralDefects[selectedDefect].type] || REPAIR_COSTS["Structural Crack"]).action}</p>
                                 </div>
                             </div>
                         )}
                         
-                        <div className="space-y-2 text-sm font-mono mt-2">
+                        <div className="space-y-2 text-sm font-mono mt-4">
                             {property.structuralDefects.length > 0 ? (
                                 property.structuralDefects.map((defect, i) => (
                                     <div 
                                         key={i} 
                                         onClick={() => setSelectedDefect(selectedDefect === i ? null : i)}
-                                        className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${selectedDefect === i ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-red-500/10 border border-red-500/20 hover:bg-red-500/20'}`}
+                                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border ${selectedDefect === i ? 'bg-cyan-500/10 border-cyan-500/40 shadow-[0_0_15px_rgba(0,229,255,0.1)]' : 'bg-black border-white/5 hover:border-white/10 hover:bg-white/5'}`}
                                     >
-                                        <span className={`w-2 h-2 rounded-full ${selectedDefect === i ? 'bg-yellow-400' : 'bg-red-500 animate-pulse'}`}></span>
-                                        <span className={`text-xs flex-1 ${selectedDefect === i ? 'text-yellow-400' : 'text-red-400'}`}>{defect.type.toUpperCase()}</span>
-                                        <span className={`text-xs font-bold ${selectedDefect === i ? 'text-yellow-300' : 'text-red-300'}`}>{(defect.confidence * 100).toFixed(0)}%</span>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${selectedDefect === i ? 'bg-cyan-400 shadow-[0_0_8px_rgba(0,229,255,1)]' : 'bg-red-500'}`}></span>
+                                        <span className={`text-[10px] uppercase tracking-widest flex-1 ${selectedDefect === i ? 'text-cyan-300' : 'text-slate-400'}`}>{defect.type}</span>
+                                        <span className={`text-[10px] ${selectedDefect === i ? 'text-cyan-400' : 'text-slate-600'}`}>{(defect.confidence * 100).toFixed(0)}%</span>
                                     </div>
                                 ))
                             ) : (
-                                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-center">
-                                    <span className="text-green-400 font-bold text-sm">✓ No structural defects detected</span>
-                                    <p className="text-green-400/60 text-xs mt-1">Gemini Pro Vision scan complete</p>
+                                <div className="p-5 bg-emerald-950/20 border border-emerald-500/20 rounded-xl text-center">
+                                    <svg className="w-6 h-6 text-emerald-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                    <span className="text-emerald-400 text-[10px] uppercase tracking-[0.2em] block">No Anomalies Detected</span>
+                                    <p className="text-emerald-500/50 text-[9px] uppercase tracking-widest mt-1">Deep Scan Complete</p>
                                 </div>
                             )}
                         </div>
                     </div>
                 )}
             </div>
+            
+            <style jsx>{`
+                @keyframes scan {
+                    0% { top: 0; opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { top: 100%; opacity: 0; }
+                }
+            `}</style>
         </aside>
     );
 }
 
 function ScoreBadge({ label, value, max, color }: { label: string, value: number, max: number, color: string }) {
     const colorMap: Record<string, string> = {
-        green: 'bg-green-500/20 text-green-400 border-green-500/30',
-        yellow: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-        red: 'bg-red-500/20 text-red-400 border-red-500/30'
+        emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]',
+        cyan: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 shadow-[0_0_15px_rgba(0,229,255,0.1)]',
+        yellow: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.1)]',
+        red: 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
     };
     return (
-        <div className={`px-2 py-1 rounded border text-[9px] uppercase tracking-widest font-bold text-center ${colorMap[color] || colorMap.green}`}>
-            <span className="block">{label}</span>
-            <span className="text-sm">{typeof value === 'number' ? value.toFixed(1) : value}/{max}</span>
+        <div className={`px-2 py-1.5 rounded-lg border text-[8px] uppercase tracking-[0.2em] font-bold text-center flex-1 ${colorMap[color] || colorMap.emerald} backdrop-blur-sm`}>
+            <span className="block opacity-70 mb-0.5">{label}</span>
+            <span className="text-sm font-mono">{typeof value === 'number' ? value.toFixed(1) : value}/{max}</span>
         </div>
     );
 }
@@ -319,9 +354,9 @@ function TabButton({ active, onClick, label, icon }: { active: boolean, onClick:
     return (
         <button 
             onClick={onClick}
-            className={`flex-1 py-3 text-[9px] font-bold uppercase tracking-widest transition-all border-b-2 ${active ? 'text-green-400 border-green-400 bg-slate-800' : 'text-slate-500 border-transparent hover:text-slate-300 hover:bg-slate-800/50'}`}
+            className={`flex-1 py-4 text-[9px] font-bold uppercase tracking-[0.2em] transition-all border-b-2 flex flex-col items-center justify-center gap-1 ${active ? 'text-cyan-400 border-cyan-400 bg-cyan-500/5' : 'text-slate-500 border-transparent hover:text-cyan-100 hover:bg-white/5 hover:border-white/10'}`}
         >
-            <span className="block text-sm mb-0.5">{icon}</span>
+            <span className={`block text-sm ${active ? 'opacity-100 filter drop-shadow-[0_0_8px_rgba(0,229,255,0.8)]' : 'opacity-50 grayscale'}`}>{icon}</span>
             {label}
         </button>
     );
@@ -329,9 +364,9 @@ function TabButton({ active, onClick, label, icon }: { active: boolean, onClick:
 
 function Row({ label, value, valueColor = "text-slate-100" }: { label: string, value: string, valueColor?: string }) {
     return (
-        <div className="flex justify-between py-2.5 border-b border-slate-800/50">
-            <span className="text-slate-500 text-xs">{label}</span>
-            <span className={`${valueColor} font-semibold text-right max-w-[60%] text-xs`}>{value}</span>
+        <div className="flex justify-between py-2 border-b border-white/5 last:border-0">
+            <span className="text-slate-500 text-[10px] tracking-widest uppercase">{label}</span>
+            <span className={`${valueColor} font-bold text-right max-w-[60%] text-[11px]`}>{value}</span>
         </div>
     );
 }

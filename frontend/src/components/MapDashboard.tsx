@@ -20,9 +20,9 @@ function formatPrice(price: number): string {
 function getScoreColor(propId: string): { dotColor: string; glowRgba: string; score: number } {
     const idx = parseInt(propId.split("-")[1]) || 1;
     const score = 25 + ((idx * 17) % 70);
-    if (score >= 65) return { dotColor: "#22c55e", glowRgba: "rgba(34,197,94,0.6)", score };
-    if (score >= 40) return { dotColor: "#eab308", glowRgba: "rgba(234,179,8,0.6)", score };
-    return { dotColor: "#ef4444", glowRgba: "rgba(239,68,68,0.6)", score };
+    if (score >= 65) return { dotColor: "#10b981", glowRgba: "rgba(16,185,129,0.8)", score }; // emerald-500
+    if (score >= 40) return { dotColor: "#eab308", glowRgba: "rgba(234,179,8,0.8)", score };
+    return { dotColor: "#ef4444", glowRgba: "rgba(239,68,68,0.8)", score };
 }
 
 export default function MapDashboard({ properties, selectedId, onPropertyClick, onBoundsChange }: MapDashboardProps) {
@@ -48,9 +48,7 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
             maxZoom: 18,
         });
 
-        L.control.zoom({ position: "bottomright" }).addTo(map.current);
-        L.control.attribution({ position: "bottomright" }).addTo(map.current);
-
+        // Use standard CARTO dark matter, but we filter it via CSS later to make it darker
         L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
             attribution: "&copy; OpenStreetMap &copy; CARTO",
             subdomains: "abcd",
@@ -109,42 +107,54 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
             const showLabel = currentZoom >= 14;
             const isSelected = prop.id === selectedId;
 
+            const size = isSelected ? 20 : 12;
+            const coreSize = isSelected ? 12 : 6;
+
             const markerHtml = `
-                <div class="marker-enter" style="position:relative;cursor:pointer;display:flex;align-items:center;gap:4px;">
-                    <div style="width:${isSelected ? 18 : 12}px;height:${isSelected ? 18 : 12}px;border-radius:50%;border:2px solid ${isSelected ? '#fff' : 'rgba(255,255,255,0.7)'};background:${dotColor};box-shadow:0 0 ${isSelected ? 20 : 8}px ${glowRgba};transition:all 0.3s;"></div>
-                    <div style="position:absolute;top:-2px;left:-2px;width:${isSelected ? 22 : 16}px;height:${isSelected ? 22 : 16}px;border-radius:50%;background:${dotColor};opacity:0.25;animation:radar-ping 2.5s cubic-bezier(0,0,0.2,1) infinite;"></div>
-                    ${showLabel ? `<span style="position:absolute;left:18px;top:-3px;background:rgba(15,23,42,0.9);border:1px solid rgba(100,116,139,0.25);padding:1px 5px;border-radius:4px;font-size:9px;font-family:ui-monospace,monospace;color:${dotColor};white-space:nowrap;font-weight:700;backdrop-filter:blur(4px);">${formatPrice(prop.price)}</span>` : ""}
+                <div class="marker-enter" style="position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;">
+                    <!-- Outer Ring -->
+                    <div style="position:absolute;width:100%;height:100%;border-radius:50%;border:1px solid ${isSelected ? '#00e5ff' : dotColor};opacity:${isSelected ? 1 : 0.5};box-shadow:0 0 ${isSelected ? 20 : 10}px ${isSelected ? 'rgba(0,229,255,0.8)' : glowRgba};transition:all 0.3s;${isSelected ? 'animation: spin 4s linear infinite;' : ''}">
+                        ${isSelected ? '<div style="position:absolute;top:-2px;left:50%;width:4px;height:4px;background:#00e5ff;transform:translateX(-50%);border-radius:50%;"></div>' : ''}
+                    </div>
+                    <!-- Inner Core -->
+                    <div style="width:${coreSize}px;height:${coreSize}px;border-radius:50%;background:${isSelected ? '#00e5ff' : dotColor};box-shadow:0 0 10px ${isSelected ? '#00e5ff' : dotColor};transition:all 0.3s;"></div>
+                    
+                    ${showLabel ? `<span style="position:absolute;left:${size + 8}px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.1);padding:3px 6px;border-radius:2px;font-size:10px;font-family:ui-monospace,monospace;color:${isSelected ? '#00e5ff' : dotColor};white-space:nowrap;font-weight:700;backdrop-filter:blur(10px);box-shadow:0 0 10px rgba(0,0,0,0.5);">${formatPrice(prop.price)}</span>` : ""}
                 </div>
             `;
 
             const icon = L.divIcon({
                 className: "",
                 html: markerHtml,
-                iconSize: [isSelected ? 18 : 12, isSelected ? 18 : 12],
-                iconAnchor: [isSelected ? 9 : 6, isSelected ? 9 : 6],
+                iconSize: [size, size],
+                iconAnchor: [size / 2, size / 2],
             });
 
             const marker = L.marker([prop.latitude, prop.longitude], { icon }).addTo(map.current!);
 
             const tooltipContent = `
-                <div style="font-family:ui-monospace,monospace;min-width:200px;">
-                    <div style="font-weight:700;color:#f8fafc;font-size:11px;margin-bottom:4px;">${prop.address}</div>
-                    <div style="color:${dotColor};font-size:14px;font-weight:800;">${formatPrice(prop.price)}</div>
-                    <div style="display:flex;gap:8px;margin-top:5px;">
-                        <span style="color:#94a3b8;font-size:10px;">${(prop.sqft || 0).toLocaleString()} sqft</span>
-                        <span style="color:#94a3b8;font-size:10px;">${prop.bedrooms}BD / ${prop.bathrooms}BA</span>
+                <div style="font-family:ui-monospace,monospace;min-width:220px;background:rgba(5,5,5,0.9);padding:10px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 0 30px rgba(0,229,255,0.1);backdrop-filter:blur(10px);border-radius:8px;">
+                    <div style="font-weight:700;color:#f8fafc;font-size:11px;margin-bottom:6px;letter-spacing:0.05em;">${prop.address}</div>
+                    <div style="color:${dotColor};font-size:16px;font-weight:300;letter-spacing:0.05em;">${formatPrice(prop.price)}</div>
+                    <div style="display:flex;gap:12px;margin-top:8px;color:#94a3b8;font-size:10px;">
+                        <span>${(prop.sqft || 0).toLocaleString()} SQFT</span>
+                        <span>${prop.bedrooms}B / ${prop.bathrooms}B</span>
                     </div>
-                    <div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(100,116,139,0.2);display:flex;justify-content:space-between;">
-                        <span style="color:#64748b;font-size:9px;">Security: ${score}/100</span>
-                        <span style="color:${dotColor};font-size:9px;font-weight:700;">●  ${score >= 65 ? "LOW RISK" : score >= 40 ? "MODERATE" : "HIGH RISK"}</span>
+                    <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;">
+                        <span style="color:#64748b;font-size:9px;text-transform:uppercase;letter-spacing:0.1em;">Security: ${score}/100</span>
+                        <span style="color:${dotColor};font-size:9px;font-weight:700;letter-spacing:0.1em;display:flex;align-items:center;gap:4px;">
+                            <span style="width:6px;height:6px;border-radius:50%;background:${dotColor};box-shadow:0 0 5px ${dotColor};"></span>
+                            ${score >= 65 ? "SECURE" : score >= 40 ? "WARNING" : "CRITICAL"}
+                        </span>
                     </div>
                 </div>
             `;
-            marker.bindTooltip(tooltipContent, { className: "custom-tooltip", direction: "top", offset: [0, -8], opacity: 1 });
+            // Remove leaflet default tooltip styling classes
+            marker.bindTooltip(tooltipContent, { className: "cyber-tooltip", direction: "top", offset: [0, -10], opacity: 1 });
 
             marker.on("click", () => {
                 onPropertyClick(prop);
-                map.current?.flyTo([prop.latitude, prop.longitude], Math.max(currentZoom, 14), { animate: true, duration: 0.8 });
+                map.current?.flyTo([prop.latitude, prop.longitude], Math.max(currentZoom, 15), { animate: true, duration: 1.2, easeLinearity: 0.1 });
             });
 
             markers.current[prop.id] = marker;
@@ -159,13 +169,14 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
             const prop = properties.find(p => p.id === selectedId);
             if (prop) {
                 const radarHtml = `
-                    <div style="position:relative;width:70px;height:70px;">
-                        <div class="radar-ring" style="position:absolute;top:0;left:0;width:70px;height:70px;border-radius:50%;border:2px solid #22c55e;opacity:0.5;"></div>
-                        <div class="radar-ring" style="position:absolute;top:12px;left:12px;width:46px;height:46px;border-radius:50%;border:1.5px solid #22c55e;opacity:0.35;animation-delay:0.4s;"></div>
-                        <div class="radar-ring" style="position:absolute;top:24px;left:24px;width:22px;height:22px;border-radius:50%;border:1px solid #22c55e;opacity:0.2;animation-delay:0.8s;"></div>
+                    <div style="position:relative;width:120px;height:120px;pointer-events:none;">
+                        <div class="radar-ring" style="position:absolute;top:0;left:0;width:120px;height:120px;border-radius:50%;border:1px solid #00e5ff;opacity:0.3;box-shadow:inset 0 0 20px rgba(0,229,255,0.1), 0 0 20px rgba(0,229,255,0.1);"></div>
+                        <div class="radar-ring" style="position:absolute;top:20px;left:20px;width:80px;height:80px;border-radius:50%;border:1px solid #00e5ff;opacity:0.5;animation-delay:0.3s;"></div>
+                        <div class="radar-ring" style="position:absolute;top:40px;left:40px;width:40px;height:40px;border-radius:50%;border:1.5px solid #00e5ff;opacity:0.8;animation-delay:0.6s;"></div>
+                        <div style="position:absolute;top:0;left:60px;width:1px;height:60px;background:linear-gradient(to top, transparent, #00e5ff);transform-origin:bottom;animation: radar-sweep 4s linear infinite;"></div>
                     </div>
                 `;
-                const radarIcon = L.divIcon({ className: "", html: radarHtml, iconSize: [70, 70], iconAnchor: [35, 35] });
+                const radarIcon = L.divIcon({ className: "", html: radarHtml, iconSize: [120, 120], iconAnchor: [60, 60] });
                 L.marker([prop.latitude, prop.longitude], { icon: radarIcon, interactive: false }).addTo(radarLayer.current!);
             }
         }
@@ -178,11 +189,11 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
         if (showHeatmap) {
             properties.forEach(prop => {
                 const { score } = getScoreColor(prop.id);
-                const radius = 200 + (100 - score) * 6;
-                const color = score >= 65 ? "#22c55e" : score >= 40 ? "#eab308" : "#ef4444";
+                const radius = 250 + (100 - score) * 8;
+                const color = score >= 65 ? "#10b981" : score >= 40 ? "#eab308" : "#ef4444";
 
                 L.circle([prop.latitude, prop.longitude], {
-                    radius, color, fillColor: color, fillOpacity: 0.06, weight: 0.8, opacity: 0.12, interactive: false,
+                    radius, color, fillColor: color, fillOpacity: 0.08, weight: 0.5, opacity: 0.2, interactive: false,
                 }).addTo(heatLayerGroup.current!);
             });
             heatLayerGroup.current.addTo(map.current);
@@ -193,31 +204,43 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
 
     return (
         <>
-            <div ref={mapContainer} className="w-full h-full absolute top-0 left-0 bg-slate-950 z-0" />
+            <div ref={mapContainer} className="w-full h-full absolute top-0 left-0 bg-[#020202] z-0 map-darken filter contrast-125 saturate-50" />
 
-            <div className="absolute top-20 right-4 z-10 flex flex-col gap-2">
-                <div className="bg-slate-900/85 backdrop-blur-xl border border-slate-700/40 rounded-xl px-3 py-2 text-center shadow-xl">
-                    <span className="text-[8px] text-slate-600 uppercase tracking-[0.15em] block">Active Nodes</span>
-                    <span className="text-2xl font-bold text-green-400 font-mono leading-tight">{properties.length}</span>
-                    <span className="text-[8px] text-slate-600 block">in view</span>
+            <style jsx global>{`
+                .leaflet-container { background: #020202 !important; }
+                .leaflet-layer { filter: brightness(0.6) contrast(1.5) sepia(0.2) hue-rotate(180deg) saturate(0.5); }
+                .cyber-tooltip { background: transparent !important; border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+                .cyber-tooltip::before { display: none !important; }
+                
+                @keyframes spin { 100% { transform: rotate(360deg); } }
+                @keyframes radar-sweep { 100% { transform: rotate(360deg); } }
+            `}</style>
+
+            <div className="absolute top-28 right-6 z-10 flex flex-col gap-3">
+                <div className="bg-[#050505]/90 backdrop-blur-3xl border border-white/10 rounded-xl px-4 py-3 text-center shadow-[0_0_30px_rgba(0,229,255,0.05)]">
+                    <span className="text-[9px] text-slate-500 uppercase tracking-[0.2em] block mb-1">Active Nodes</span>
+                    <span className="text-3xl font-light text-cyan-400 font-mono leading-none tracking-tight block drop-shadow-[0_0_10px_rgba(0,229,255,0.5)]">{properties.length}</span>
+                    <span className="text-[9px] text-slate-600 block mt-1 uppercase tracking-widest">In Sector</span>
                 </div>
 
                 <button
                     onClick={() => setShowHeatmap(!showHeatmap)}
-                    className={`px-3 py-2.5 rounded-xl border text-[9px] uppercase tracking-[0.12em] font-bold transition-all shadow-xl backdrop-blur-xl ${
+                    className={`px-4 py-3 rounded-xl border text-[9px] uppercase tracking-[0.2em] font-bold transition-all shadow-xl backdrop-blur-3xl flex items-center justify-center gap-2 ${
                         showHeatmap
-                            ? "bg-green-500/15 border-green-500/30 text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.15)]"
-                            : "bg-slate-900/85 border-slate-700/40 text-slate-500 hover:text-slate-300"
+                            ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400 shadow-[0_0_20px_rgba(0,229,255,0.2)]"
+                            : "bg-[#050505]/90 border-white/10 text-slate-500 hover:text-cyan-300 hover:border-cyan-500/30"
                     }`}
                 >
-                    🔥 {showHeatmap ? "Heat ON" : "Heat OFF"}
+                    <span className={`w-2 h-2 rounded-full ${showHeatmap ? 'bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(0,229,255,1)]' : 'bg-slate-600'}`}></span>
+                    {showHeatmap ? "Heat ON" : "Heat OFF"}
                 </button>
 
                 <button
                     onClick={() => { map.current?.setView([40.74, -73.97], 12, { animate: true }); }}
-                    className="px-3 py-2 rounded-xl border bg-slate-900/85 border-slate-700/40 text-slate-500 text-[9px] uppercase tracking-[0.12em] font-bold hover:text-green-400 hover:border-green-500/30 transition-all shadow-xl backdrop-blur-xl"
+                    className="px-4 py-3 rounded-xl border bg-[#050505]/90 border-white/10 text-slate-500 text-[9px] uppercase tracking-[0.2em] font-bold hover:text-cyan-400 hover:border-cyan-500/30 transition-all shadow-xl backdrop-blur-3xl flex items-center justify-center gap-2"
                 >
-                    🏠 Reset View
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                    Recenter
                 </button>
             </div>
         </>
