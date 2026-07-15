@@ -114,7 +114,9 @@ class GlobalAuditorService:
         if cache_key in nyc_data_cache:
             return nyc_data_cache[cache_key]
 
-        url = f"https://data.cityofnewyork.us/resource/64uk-42ks.json?$where=assesstot > 500000 AND latitude IS NOT NULL&$limit={limit}&$order=assesstot DESC"
+        from urllib.parse import quote
+        query = "assesstot > 500000 AND latitude IS NOT NULL"
+        url = f"https://data.cityofnewyork.us/resource/64uk-42ks.json?$where={quote(query)}&$limit={limit}&$order=assesstot%20DESC"
         
         async with httpx.AsyncClient(timeout=10.0) as client:
             try:
@@ -165,7 +167,9 @@ class GlobalAuditorService:
         if cache_key in nypd_crime_cache:
             return nypd_crime_cache[cache_key]
 
-        url = f"https://data.cityofnewyork.us/resource/qgea-i56i.json?$where=within_circle(lat_lon, {lat}, {lon}, 800)&$select=count(*) AS count"
+        from urllib.parse import quote
+        query = f"within_circle(lat_lon, {lat}, {lon}, 800)"
+        url = f"https://data.cityofnewyork.us/resource/qgea-i56i.json?$where={quote(query)}&$select=count(*) AS count"
         
         async with httpx.AsyncClient(timeout=5.0) as client:
             try:
