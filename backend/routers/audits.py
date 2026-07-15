@@ -34,16 +34,21 @@ async def _build_audit(property_id: str) -> Dict[str, Any]:
     seed_val = int(hashlib.sha256(property_id.encode('utf-8')).hexdigest()[:8], 16)
     random.seed(seed_val + 2)
     defects = []
-    if random.random() > 0.4:
-        num_defects = random.randint(1, 3)
-        defect_types = ["Structural Crack", "Water Damage", "Roof Sag", "Foundation Shift", "Mold Growth", "Electrical Fault"]
-        for _ in range(num_defects):
-            defects.append({
-                "type": random.choice(defect_types),
-                "box": [round(random.uniform(0.05, 0.35), 2), round(random.uniform(0.05, 0.35), 2),
-                        round(random.uniform(0.55, 0.95), 2), round(random.uniform(0.55, 0.95), 2)],
-                "confidence": round(random.uniform(0.72, 0.98), 2)
-            })
+    
+    # Guarantee at least 1-4 unique defects per property so no two properties look "empty" or identical
+    num_defects = random.randint(1, 4)
+    defect_types = ["Structural Crack", "Water Damage", "Roof Sag", "Foundation Shift", "Mold Growth", "Electrical Fault", "Thermal Leak", "Subsidence Risk"]
+    
+    # Shuffle and pick to ensure varied types
+    chosen_types = random.sample(defect_types, num_defects)
+    
+    for dtype in chosen_types:
+        defects.append({
+            "type": dtype,
+            "box": [round(random.uniform(0.02, 0.40), 2), round(random.uniform(0.02, 0.40), 2),
+                    round(random.uniform(0.50, 0.98), 2), round(random.uniform(0.50, 0.98), 2)],
+            "confidence": round(random.uniform(0.70, 0.99), 2)
+        })
 
     return {
         "id": property_id,
