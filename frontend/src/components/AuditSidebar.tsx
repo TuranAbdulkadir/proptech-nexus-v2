@@ -25,11 +25,19 @@ export default function AuditSidebar({
         "https://images.unsplash.com/photo-1600585154526-990dced4ea0d?w=800&q=80",
         "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80",
         "https://images.unsplash.com/photo-1600573472591-ee6981cf35b6?w=800&q=80",
-        "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80"
+        "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80",
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80",
+        "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?w=800&q=80",
+        "https://images.unsplash.com/photo-1600607688969-a5bfcd64bd28?w=800&q=80",
+        "https://images.unsplash.com/photo-1502672260266-1c1c2b1baad9?w=800&q=80",
+        "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800&q=80",
+        "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80",
+        "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=800&q=80",
+        "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&q=80"
     ];
     
-    // Deterministic selection based on property ID
-    const seedId = parseInt(property.id.replace(/\D/g, "") || "0", 10);
+    // Deterministic selection using Price which is highly unique per property
+    const seedId = Math.floor(property.price);
     const imageUrl = realEstateImages[seedId % realEstateImages.length];
 
     return (
