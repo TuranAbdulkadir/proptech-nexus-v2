@@ -173,7 +173,7 @@ export default function MapDashboard({ properties, selectedId, onPropertyClick, 
     }, [selectedId, properties]);
 
     return (
-        <div className="absolute inset-0 z-0 bg-nexus-900">
+        <div className="w-full h-full relative">
             <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none z-[1]"></div>
             <div className="absolute inset-0 bg-cyber-gradient opacity-90 pointer-events-none z-[2]"></div>
             
