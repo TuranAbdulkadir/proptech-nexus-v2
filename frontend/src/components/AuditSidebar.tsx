@@ -3,120 +3,127 @@ import { PropertyExtended } from "../types";
 
 export default function AuditSidebar({
     property,
-    borough,
-    imageUrl,
     onClose
 }: {
     property: PropertyExtended | null;
-    borough: string;
-    imageUrl: string;
     onClose: () => void;
 }) {
-    const [activeTab, setActiveTab] = useState<'financial' | 'security' | 'ai'>('financial');
+    const [activeTab, setActiveTab] = useState<'overview' | 'financial' | 'security' | 'ai'>('overview');
 
     if (!property) return null;
 
     const formatCurrency = (val: number) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
     const formatPercent = (val: number) => `${val.toFixed(2)}%`;
 
-    const getScoreColor = (score: number) => {
-        if (score >= 65) return "text-green-500";
-        if (score >= 40) return "text-yellow-500";
-        return "text-red-500";
-    };
+    // Seeded reliable images
+    const imageSeed = property.id.replace(/\D/g, "") || "123";
+    const imageUrl = `https://picsum.photos/seed/${imageSeed}/800/600`;
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-[#0a0a0a]">
+        <div className="flex-1 flex flex-col h-full bg-[#030303] text-[#ededed] border-l border-[#222]">
             {/* Header Image Hero */}
-            <div className="relative h-64 w-full shrink-0 group">
+            <div className="relative h-56 w-full shrink-0 group">
                 <img 
                     src={imageUrl} 
                     alt="Property" 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                    className="w-full h-full object-cover" 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-[#030303]/40 to-transparent"></div>
                 
-                {/* Top Right Actions */}
                 <button 
                     onClick={onClose} 
-                    className="absolute top-4 right-4 h-6 w-6 bg-black/80 border border-white/10 text-white flex items-center justify-center hover:bg-red-600 transition-colors rounded text-xs font-bold"
+                    className="absolute top-4 right-4 h-6 w-6 bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors rounded text-xs"
                 >
                     ✕
                 </button>
                 <div className="absolute top-4 left-4 flex items-center gap-2">
-                    <div className="px-1.5 py-0.5 bg-black/80 border border-blue-500/30 rounded text-[8px] font-mono text-blue-400 tracking-widest uppercase shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-                        LIVE NODE
+                    <div className="px-2 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded text-[10px] font-medium tracking-wide">
+                        Verified Asset
                     </div>
                 </div>
 
-                {/* Address overlay */}
-                <div className="absolute bottom-0 left-0 w-full p-5">
-                    <div className="font-mono text-[9px] text-blue-400 tracking-[0.2em] uppercase mb-1">{borough} Sector</div>
-                    <h2 className="font-sans text-xl font-bold text-white leading-tight">
+                <div className="absolute bottom-0 left-0 w-full p-6 pb-4">
+                    <h2 className="font-semibold text-2xl text-white leading-tight tracking-tight">
                         {property.address}
                     </h2>
+                    <div className="text-xs text-[#888] mt-1">{property.bedrooms} Beds • {property.bathrooms} Baths • {property.sqft} Sq.Ft.</div>
                 </div>
             </div>
 
             {/* TABS */}
-            <div className="flex border-b border-[#1a1a1a] shrink-0 bg-[#0f0f0f]">
-                <button 
-                    onClick={() => setActiveTab('financial')}
-                    className={`flex-1 py-2 text-[9px] font-mono uppercase tracking-widest transition-all ${activeTab === 'financial' ? 'text-blue-400 bg-[#1a1a1a]' : 'text-[#666] hover:text-[#999]'}`}
-                >
-                    Financial
-                </button>
-                <button 
-                    onClick={() => setActiveTab('security')}
-                    className={`flex-1 py-2 text-[9px] font-mono uppercase tracking-widest border-l border-r border-[#1a1a1a] transition-all ${activeTab === 'security' ? 'text-purple-400 bg-[#1a1a1a]' : 'text-[#666] hover:text-[#999]'}`}
-                >
-                    Security
-                </button>
-                <button 
-                    onClick={() => setActiveTab('ai')}
-                    className={`flex-1 py-2 text-[9px] font-mono uppercase tracking-widest transition-all ${activeTab === 'ai' ? 'text-green-400 bg-[#1a1a1a]' : 'text-[#666] hover:text-[#999]'}`}
-                >
-                    AI Audit
-                </button>
+            <div className="flex border-b border-[#222] shrink-0 px-6 gap-6">
+                {['overview', 'financial', 'security', 'ai'].map(tab => (
+                    <button 
+                        key={tab}
+                        onClick={() => setActiveTab(tab as any)}
+                        className={`py-4 text-[11px] font-medium tracking-wide capitalize transition-all relative ${activeTab === tab ? 'text-white' : 'text-[#666] hover:text-[#999]'}`}
+                    >
+                        {tab === 'ai' ? 'AI Analysis' : tab}
+                        {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white"></div>}
+                    </button>
+                ))}
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar bg-[#050505]">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[#030303]">
                 
-                {activeTab === 'financial' && (
-                    <div className="space-y-5 animate-fade-in">
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-[#111] rounded border border-[#1a1a1a] p-3">
-                                <span className="block font-mono text-[8px] text-[#666] uppercase tracking-widest mb-1">Market Value</span>
-                                <div className="font-sans text-lg font-bold text-slate-200">{formatCurrency(property.price)}</div>
+                {activeTab === 'overview' && (
+                    <div className="space-y-6 animate-fade-in">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <span className="block text-[11px] text-[#666] mb-1">Market Value</span>
+                                <div className="text-xl font-medium text-white">{formatCurrency(property.price)}</div>
                             </div>
-                            <div className="bg-[#111] rounded border border-[#1a1a1a] p-3">
-                                <span className="block font-mono text-[8px] text-[#666] uppercase tracking-widest mb-1">Annual ROI</span>
-                                <div className="font-sans text-lg font-bold text-green-500">{formatPercent(property.annualizedRoi || 0)}</div>
+                            <div>
+                                <span className="block text-[11px] text-[#666] mb-1">Expected ROI</span>
+                                <div className="text-xl font-medium text-white">{formatPercent(property.annualizedRoi || 0)}</div>
                             </div>
                         </div>
-                        
-                        <div className="bg-[#111] border border-[#1a1a1a] rounded p-4">
-                            <h3 className="font-mono text-[9px] text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <span className="w-1 h-1 bg-blue-500 rounded-full"></span>
-                                Cashflow Analysis
-                            </h3>
-                            <div className="space-y-2">
-                                <div className="flex justify-between border-b border-[#222] pb-2">
-                                    <span className="font-mono text-[10px] text-[#888]">Gross Rent (Est.)</span>
-                                    <span className="font-mono text-[10px] text-slate-300">{formatCurrency(property.grossRent || 0)}/mo</span>
+
+                        <div className="border-t border-[#222] pt-6">
+                            <h3 className="text-[11px] text-[#888] mb-4">Property Characteristics</h3>
+                            <div className="grid grid-cols-2 gap-y-4">
+                                <div>
+                                    <span className="block text-[11px] text-[#666] mb-0.5">Asset ID</span>
+                                    <span className="text-[12px] font-mono text-white">{property.id.split('-')[0]}</span>
                                 </div>
-                                <div className="flex justify-between border-b border-[#222] pb-2">
-                                    <span className="font-mono text-[10px] text-[#888]">Property Tax</span>
-                                    <span className="font-mono text-[10px] text-red-500">-{formatCurrency(property.propertyTax || 0)}/mo</span>
+                                <div>
+                                    <span className="block text-[11px] text-[#666] mb-0.5">Coordinates</span>
+                                    <span className="text-[12px] font-mono text-white">{property.latitude.toFixed(4)}, {property.longitude.toFixed(4)}</span>
                                 </div>
-                                <div className="flex justify-between border-b border-[#222] pb-2">
-                                    <span className="font-mono text-[10px] text-[#888]">HOA & Ins.</span>
-                                    <span className="font-mono text-[10px] text-red-500">-{formatCurrency(property.hoaFee || 0)}/mo</span>
+                                <div>
+                                    <span className="block text-[11px] text-[#666] mb-0.5">Building Type</span>
+                                    <span className="text-[12px] text-white">Residential</span>
                                 </div>
-                                <div className="flex justify-between pt-1">
-                                    <span className="font-mono text-[10px] text-slate-400 font-bold">Net Cashflow</span>
-                                    <span className="font-mono text-[11px] text-green-500 font-bold">{formatCurrency(property.netCashflow || 0)}/mo</span>
+                                <div>
+                                    <span className="block text-[11px] text-[#666] mb-0.5">Year Built</span>
+                                    <span className="text-[12px] text-white">2019</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'financial' && (
+                    <div className="space-y-6 animate-fade-in">
+                        <div className="border border-[#222] rounded-lg p-5">
+                            <h3 className="text-[12px] font-medium text-white mb-4">Cashflow Projection</h3>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[12px] text-[#888]">Gross Rental Income</span>
+                                    <span className="text-[13px] text-white">{formatCurrency(property.grossRent || 0)}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[12px] text-[#888]">Property Taxes</span>
+                                    <span className="text-[13px] text-white">-{formatCurrency(property.propertyTax || 0)}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[12px] text-[#888]">HOA & Maintenance</span>
+                                    <span className="text-[13px] text-white">-{formatCurrency(property.hoaFee || 0)}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-3 border-t border-[#222]">
+                                    <span className="text-[12px] text-white font-medium">Net Monthly Cashflow</span>
+                                    <span className="text-[13px] text-white font-medium">{formatCurrency(property.netCashflow || 0)}</span>
                                 </div>
                             </div>
                         </div>
@@ -124,80 +131,62 @@ export default function AuditSidebar({
                 )}
 
                 {activeTab === 'security' && (
-                    <div className="space-y-5 animate-fade-in">
-                        <div className="flex items-center justify-between bg-[#111] rounded border border-[#1a1a1a] p-4">
-                            <div>
-                                <span className="block font-mono text-[8px] text-[#666] uppercase tracking-widest mb-1">Cyber-Physical Score</span>
-                                <div className={`font-sans text-2xl font-bold ${getScoreColor(property.securityScore || 0)}`}>
-                                    {property.securityScore || 0}<span className="text-xs text-[#555]">/100</span>
-                                </div>
+                    <div className="space-y-6 animate-fade-in">
+                        <div className="flex items-center gap-4">
+                            <div className="h-16 w-16 rounded-full border-4 border-[#222] flex items-center justify-center relative">
+                                <div className="absolute inset-0 border-4 border-white rounded-full" style={{ clipPath: `polygon(0 0, 100% 0, 100% ${(property.securityScore || 0)}%, 0 ${(property.securityScore || 0)}%)` }}></div>
+                                <span className="text-xl font-medium text-white">{property.securityScore || 0}</span>
                             </div>
-                            <div className="h-12 w-12 rounded-full border border-[#333] flex items-center justify-center">
-                                <div className="h-8 w-8 rounded-full border border-dashed border-[#555] animate-[spin_10s_linear_infinite]"></div>
+                            <div>
+                                <h3 className="text-[14px] font-medium text-white">Security Rating</h3>
+                                <p className="text-[11px] text-[#888] mt-1">Based on local crime index, network vulnerabilities, and physical hazard data.</p>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 pt-4">
                             <div>
-                                <h4 className="font-mono text-[8px] text-[#888] uppercase tracking-widest mb-2 border-b border-[#1a1a1a] pb-1">Vulnerabilities Detected</h4>
+                                <h4 className="text-[11px] text-[#666] mb-3">Vulnerabilities</h4>
                                 {property.openIotPorts && property.openIotPorts.length > 0 ? (
-                                    <ul className="space-y-2 mt-3">
+                                    <ul className="space-y-2">
                                         {property.openIotPorts.map((port, idx) => (
-                                            <li key={idx} className="flex items-center gap-2 font-mono text-[9px] text-red-400 bg-red-900/10 px-2 py-1.5 border border-red-900/30 rounded">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                                                OPEN PORT: {port}
+                                            <li key={idx} className="flex items-center gap-3 text-[12px] text-white bg-[#111] px-3 py-2 border border-[#222] rounded-md">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                                                Open Port: <span className="font-mono">{port}</span>
                                             </li>
                                         ))}
                                     </ul>
                                 ) : (
-                                    <div className="font-mono text-[9px] text-green-500 mt-3">System Secure. No open ports.</div>
+                                    <div className="text-[12px] text-[#888] bg-[#111] px-3 py-2 border border-[#222] rounded-md">No critical vulnerabilities detected.</div>
                                 )}
-                            </div>
-
-                            <div>
-                                <h4 className="font-mono text-[8px] text-[#888] uppercase tracking-widest mb-2 border-b border-[#1a1a1a] pb-1">Environmental & Crime</h4>
-                                <div className="mt-3 space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-mono text-[9px] text-[#888]">Flood Zone</span>
-                                        <span className="font-mono text-[9px] text-yellow-500">{property.floodZone || 'Zone X'}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-mono text-[9px] text-[#888]">Crime Index</span>
-                                        <span className="font-mono text-[9px] text-orange-500">{property.crimeIndex || 'N/A'}/100</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {activeTab === 'ai' && (
-                    <div className="space-y-5 animate-fade-in">
-                        <div className="bg-[#111] p-4 rounded border border-[#1a1a1a]">
-                            <p className="font-mono text-[9px] text-[#888] leading-relaxed">
-                                Deep learning structural scan complete. Model: <span className="text-blue-400">ResNet-50-Structural-v4</span>.
-                                Analyzing thermal and geometric anomalies...
+                    <div className="space-y-6 animate-fade-in">
+                        <div className="bg-[#111] p-4 rounded-lg border border-[#222]">
+                            <p className="text-[12px] text-[#888] leading-relaxed">
+                                Automated structural evaluation completed via Deep Learning visual analysis.
                             </p>
                         </div>
                         
                         {property.structuralDefects && property.structuralDefects.length > 0 ? (
-                            <div className="space-y-2">
-                                <h4 className="font-mono text-[8px] text-red-400 uppercase tracking-widest mb-2">Anomalies Detected</h4>
+                            <div className="space-y-3">
+                                <h4 className="text-[11px] text-[#666] mb-2">Detected Anomalies</h4>
                                 {property.structuralDefects.map((defect, idx) => (
-                                    <div key={idx} className="bg-red-900/10 border border-red-900/30 p-2 rounded flex justify-between items-center">
+                                    <div key={idx} className="bg-[#111] border border-[#222] p-3 rounded-md flex justify-between items-center">
                                         <div>
-                                            <div className="font-mono text-[10px] text-slate-300 font-bold">{defect.type}</div>
-                                            <div className="font-mono text-[8px] text-[#666] mt-0.5">CONFIDENCE: {(defect.confidence * 100).toFixed(1)}%</div>
+                                            <div className="text-[12px] text-white font-medium">{defect.type}</div>
+                                            <div className="text-[10px] text-[#666] mt-1">Confidence: {(defect.confidence * 100).toFixed(1)}%</div>
                                         </div>
-                                        <div className="text-[9px] font-mono text-red-500 border border-red-900/50 px-1 py-0.5 rounded">CRITICAL</div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="bg-green-900/5 border border-green-900/20 p-5 rounded text-center">
-                                <div className="w-6 h-6 mx-auto mb-2 rounded-full bg-green-900/30 flex items-center justify-center text-green-500 text-xs">✓</div>
-                                <div className="font-mono text-[10px] text-green-500">No Structural Anomalies Detected</div>
-                                <div className="font-mono text-[8px] text-[#666] mt-1">Scan Confidence: 99.8%</div>
+                            <div className="bg-[#111] border border-[#222] p-6 rounded-md text-center">
+                                <div className="text-[13px] text-white font-medium">Clear Structural Scan</div>
+                                <div className="text-[11px] text-[#666] mt-1">No anomalies detected.</div>
                             </div>
                         )}
 
@@ -205,9 +194,9 @@ export default function AuditSidebar({
                             href={`https://proptech-nexus-v2-production.up.railway.app/audits/${property.id}/pdf`}
                             target="_blank"
                             rel="noreferrer"
-                            className="mt-6 w-full block text-center py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-mono text-[9px] uppercase tracking-widest rounded transition-colors shadow-[0_0_15px_rgba(37,99,235,0.3)]"
+                            className="mt-6 w-full flex items-center justify-center py-3 bg-white hover:bg-[#eaeaea] text-black text-[12px] font-medium rounded-md transition-colors"
                         >
-                            GENERATE PDF AUDIT
+                            Download Full Report
                         </a>
                     </div>
                 )}

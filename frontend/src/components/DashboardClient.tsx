@@ -139,8 +139,6 @@ export default function DashboardClient({ initialMetrics }: { initialMetrics: an
                 {selectedProperty ? (
                     <AuditSidebar
                         property={selectedProperty}
-                        borough={selectedProperty ? (selectedProperty as any).borough || "King County" : ""}
-                        imageUrl={selectedProperty ? `https://loremflickr.com/800/600/mansion,architecture?lock=${parseInt(selectedProperty.id.replace(/\D/g, "") || "0") % 100000}` : ""}
                         onClose={() => { setSelectedProperty(null); setSelectedId(null); }}
                     />
                 ) : (
