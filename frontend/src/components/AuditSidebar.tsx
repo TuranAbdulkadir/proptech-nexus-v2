@@ -15,9 +15,22 @@ export default function AuditSidebar({
     const formatCurrency = (val: number) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
     const formatPercent = (val: number) => `${val.toFixed(2)}%`;
 
-    // Seeded reliable images
-    const imageSeed = property.id.replace(/\D/g, "") || "123";
-    const imageUrl = `https://picsum.photos/seed/${imageSeed}/800/600`;
+    const realEstateImages = [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
+        "https://images.unsplash.com/photo-1600607687931-cebf108bc3e5?w=800&q=80",
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+        "https://images.unsplash.com/photo-1600566753086-00f18ef0221f?w=800&q=80",
+        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80",
+        "https://images.unsplash.com/photo-1600585154526-990dced4ea0d?w=800&q=80",
+        "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80",
+        "https://images.unsplash.com/photo-1600573472591-ee6981cf35b6?w=800&q=80",
+        "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80"
+    ];
+    
+    // Deterministic selection based on property ID
+    const seedId = parseInt(property.id.replace(/\D/g, "") || "0", 10);
+    const imageUrl = realEstateImages[seedId % realEstateImages.length];
 
     return (
         <div className="flex-1 flex flex-col h-full bg-[#030303] text-[#ededed] border-l border-[#222]">

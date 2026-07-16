@@ -9,48 +9,46 @@ export default function PropertyList({ properties, onSelect, selectedId }: { pro
     );
 
     return (
-        <div className="h-full overflow-y-auto custom-scrollbar bg-[#0a0a0a]">
+        <div className="h-full flex flex-col bg-[#030303]">
             {/* Header */}
-            <div className="sticky top-0 bg-[#0f0f0f] border-b border-[#1a1a1a] p-2 flex items-center justify-between z-10">
-                <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
-                    <span className="font-mono text-[9px] text-[#888] uppercase tracking-widest">Registry</span>
+            <div className="sticky top-0 bg-[#030303]/90 backdrop-blur-md border-b border-[#222] p-4 flex items-center justify-between z-10">
+                <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-white"></div>
+                    <span className="text-[12px] font-medium text-white tracking-wide">Registry</span>
                 </div>
-                <span className="font-mono text-[9px] text-blue-400 border border-blue-900/50 bg-blue-900/10 px-1.5 py-0.5 rounded uppercase">{properties.length} FOUND</span>
+                <span className="text-[11px] text-[#888]">{properties.length} Results</span>
             </div>
 
             {/* List Body */}
-            <div className="flex flex-col">
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {properties.map(prop => {
                     const ext = prop as any;
                     const priceM = (prop.price / 1_000_000).toFixed(2);
                     const roi = ext.annualizedRoi ? ext.annualizedRoi.toFixed(1) : "?";
-                    const score = ext.securityScore || 0;
-                    const scoreColor = score >= 65 ? "text-green-500" : score >= 40 ? "text-yellow-500" : "text-red-500";
                     const isSelected = selectedId === prop.id;
 
                     return (
                         <div 
                             key={prop.id}
                             onClick={() => onSelect(prop)}
-                            className={`group cursor-pointer border-b border-[#1a1a1a] p-3 transition-colors ${isSelected ? 'bg-[#141414] border-l-2 border-l-blue-500' : 'bg-[#0a0a0a] border-l-2 border-l-transparent hover:bg-[#111]'}`}
+                            className={`group cursor-pointer border-b border-[#222] p-4 transition-all ${isSelected ? 'bg-[#111] border-l-4 border-l-white' : 'bg-[#030303] border-l-4 border-l-transparent hover:bg-[#0a0a0a]'}`}
                         >
-                            <h3 className={`font-mono text-[11px] mb-2 leading-tight uppercase truncate ${isSelected ? 'text-blue-400 font-bold' : 'text-slate-300 group-hover:text-white'}`}>
+                            <h3 className={`text-[13px] mb-3 leading-tight truncate ${isSelected ? 'text-white font-medium' : 'text-[#aaa] group-hover:text-white'}`}>
                                 {prop.address}
                             </h3>
                             
                             <div className="grid grid-cols-3 gap-2">
                                 <div>
-                                    <span className="block font-mono text-[8px] text-[#666] uppercase mb-0.5">Value</span>
-                                    <span className="font-mono text-[10px] text-slate-200">${priceM}M</span>
+                                    <span className="block text-[10px] text-[#666] mb-1">Value</span>
+                                    <span className="text-[12px] text-white font-medium">${priceM}M</span>
                                 </div>
                                 <div>
-                                    <span className="block font-mono text-[8px] text-[#666] uppercase mb-0.5">ROI</span>
-                                    <span className="font-mono text-[10px] text-green-400">{roi}%</span>
+                                    <span className="block text-[10px] text-[#666] mb-1">ROI</span>
+                                    <span className="text-[12px] text-white font-medium">{roi}%</span>
                                 </div>
                                 <div>
-                                    <span className="block font-mono text-[8px] text-[#666] uppercase mb-0.5">Security</span>
-                                    <span className={`font-mono text-[10px] ${scoreColor}`}>{score}</span>
+                                    <span className="block text-[10px] text-[#666] mb-1">SqFt</span>
+                                    <span className="text-[12px] text-white font-medium">{prop.sqft}</span>
                                 </div>
                             </div>
                         </div>
