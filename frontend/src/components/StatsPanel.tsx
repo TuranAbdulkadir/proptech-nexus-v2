@@ -1,85 +1,83 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 
-interface StatsPanelProps {
-    stats: {
-        totalValue: number;
-        avgPrice: number;
-        maxP: number;
-        minP: number;
-        avgSqft: number;
-        count: number;
-    };
-}
-
-export default function StatsPanel({ stats }: StatsPanelProps) {
-    const [collapsed, setCollapsed] = useState(false);
-
-    if (collapsed) {
-        return (
-            <button
-                onClick={() => setCollapsed(false)}
-                className="absolute bottom-6 right-4 z-10 bg-slate-900/85 backdrop-blur-xl border border-slate-700/50 rounded-xl px-3 py-2 text-[9px] text-slate-500 uppercase tracking-[0.15em] font-bold hover:text-green-400 hover:border-green-500/30 transition-all shadow-xl"
-            >
-                📊 Stats
-            </button>
-        );
-    }
+export default function StatsPanel({ stats }: { stats: any }) {
+    if (!stats) return null;
 
     return (
-        <div className="absolute bottom-6 right-4 z-10 w-[200px] bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden">
-            <div className="flex items-center justify-between px-3 py-2 bg-slate-800/60 border-b border-slate-700/50">
-                <span className="text-[9px] text-slate-500 uppercase tracking-[0.2em] font-bold">Portfolio Analytics</span>
-                <button onClick={() => setCollapsed(true)} className="text-slate-600 hover:text-slate-300 text-xs transition-colors">—</button>
-            </div>
-
-            <div className="p-3 space-y-3">
-                <StatRow label="Active Nodes" value={stats.count.toString()} color="text-green-400" />
-                <StatRow label="Total Value" value={`$${(stats.totalValue / 1e6).toFixed(1)}M`} color="text-cyan-400" />
-                <StatRow label="Avg Price" value={`$${(stats.avgPrice / 1e6).toFixed(2)}M`} color="text-slate-200" />
-                <StatRow label="Highest" value={`$${(stats.maxP / 1e6).toFixed(1)}M`} color="text-green-400" />
-                <StatRow label="Lowest" value={`$${(stats.minP / 1e3).toFixed(0)}K`} color="text-yellow-400" />
-                <StatRow label="Avg Sqft" value={`${stats.avgSqft.toFixed(0)}`} color="text-slate-300" />
-
-                <div className="pt-2 border-t border-slate-700/50">
-                    <div className="text-[9px] text-slate-600 uppercase tracking-widest mb-1.5">Price Distribution</div>
-                    <PriceDistribution stats={stats} />
+        <div className="absolute bottom-6 right-6 w-96 z-[1000] pointer-events-none">
+            <div className="pointer-events-auto bg-nexus-800/85 backdrop-blur-2xl border border-nexus-700/50 rounded-2xl shadow-glass overflow-hidden flex flex-col">
+                
+                {/* Header */}
+                <div className="bg-gradient-to-r from-nexus-700/40 to-transparent p-4 border-b border-nexus-700/50 flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-nexus-purple animate-pulse shadow-neon-cyan"></div>
+                    <h2 className="font-display font-bold text-slate-200 text-sm tracking-[0.2em] uppercase">Macro Analytics</h2>
                 </div>
-            </div>
-        </div>
-    );
-}
 
-function StatRow({ label, value, color }: { label: string; value: string; color: string }) {
-    return (
-        <div className="flex justify-between items-center">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider">{label}</span>
-            <span className={`text-sm font-bold font-mono ${color}`}>{value}</span>
-        </div>
-    );
-}
-
-function PriceDistribution({ stats }: { stats: StatsPanelProps["stats"] }) {
-    const ranges = [
-        { label: "<1M", pct: stats.minP < 1e6 ? 35 : 10 },
-        { label: "1-5M", pct: 40 },
-        { label: "5-10M", pct: 15 },
-        { label: ">10M", pct: stats.maxP > 10e6 ? 20 : 5 },
-    ];
-
-    return (
-        <div className="space-y-1.5">
-            {ranges.map((r, i) => (
-                <div key={i} className="flex items-center gap-2">
-                    <span className="text-[8px] text-slate-600 w-8 font-mono">{r.label}</span>
-                    <div className="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                        <div
-                            className="h-full rounded-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-700"
-                            style={{ width: `${r.pct}%` }}
-                        ></div>
+                {/* Body */}
+                <div className="p-5 space-y-6">
+                    
+                    {/* Primary Stats Row */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-nexus-900/50 rounded-xl p-3 border border-nexus-700/30">
+                            <span className="block font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-1">Active Nodes</span>
+                            <div className="flex items-end gap-2">
+                                <span className="font-display text-2xl font-bold text-white">{stats.totalProperties}</span>
+                                <span className="font-mono text-[10px] text-nexus-neon mb-1">LIVE</span>
+                            </div>
+                        </div>
+                        <div className="bg-nexus-900/50 rounded-xl p-3 border border-nexus-700/30">
+                            <span className="block font-mono text-[9px] text-slate-400 uppercase tracking-widest mb-1">Total Market Value</span>
+                            <div className="flex items-end gap-1">
+                                <span className="font-display text-2xl font-bold text-white">{(stats.totalValue / 1_000_000).toFixed(1)}</span>
+                                <span className="font-mono text-[11px] text-nexus-cyan mb-1">M</span>
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Secondary Metrics */}
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center group">
+                            <span className="font-mono text-[10px] text-slate-400 uppercase tracking-widest group-hover:text-white transition-colors">Avg Price</span>
+                            <span className="font-mono text-sm text-nexus-cyan">${(stats.averagePrice / 1_000_000).toFixed(2)}M</span>
+                        </div>
+                        <div className="flex justify-between items-center group">
+                            <span className="font-mono text-[10px] text-slate-400 uppercase tracking-widest group-hover:text-white transition-colors">Peak Value</span>
+                            <span className="font-mono text-sm text-nexus-purple">${(stats.highestPrice / 1_000_000).toFixed(1)}M</span>
+                        </div>
+                        <div className="flex justify-between items-center group">
+                            <span className="font-mono text-[10px] text-slate-400 uppercase tracking-widest group-hover:text-white transition-colors">Avg Floor Space</span>
+                            <span className="font-mono text-sm text-slate-200">{stats.averageSqft} <span className="text-[9px] text-slate-500">SQFT</span></span>
+                        </div>
+                    </div>
+
+                    {/* Distribution Bars */}
+                    <div className="pt-3 border-t border-nexus-700/30">
+                        <span className="block font-mono text-[9px] text-slate-500 uppercase tracking-widest mb-3">Value Distribution</span>
+                        
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <span className="font-mono text-[9px] text-slate-400 w-8">{"< 1M"}</span>
+                                <div className="flex-1 h-1.5 bg-nexus-900 rounded-full overflow-hidden">
+                                    <div className="h-full bg-nexus-neon w-[45%] shadow-neon-green"></div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span className="font-mono text-[9px] text-slate-400 w-8">1-5M</span>
+                                <div className="flex-1 h-1.5 bg-nexus-900 rounded-full overflow-hidden">
+                                    <div className="h-full bg-nexus-cyan w-[35%] shadow-neon-cyan"></div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span className="font-mono text-[9px] text-slate-400 w-8">{"> 5M"}</span>
+                                <div className="flex-1 h-1.5 bg-nexus-900 rounded-full overflow-hidden">
+                                    <div className="h-full bg-nexus-purple w-[20%]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            ))}
+            </div>
         </div>
     );
 }

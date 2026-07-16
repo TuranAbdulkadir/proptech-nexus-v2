@@ -1,76 +1,63 @@
-"use client";
 import React from "react";
 import { Property } from "../types";
 
-interface PropertyListProps {
-    properties: Property[];
-    selectedId: string | null;
-    searchQuery: string;
-    onSearchChange: (query: string) => void;
-    onPropertyClick: (prop: Property) => void;
-    boroughs: Record<string, string>;
-}
+export default function PropertyList({ properties, onSelect }: { properties: Property[]; onSelect: (prop: Property) => void }) {
+    if (properties.length === 0) return null;
 
-export default function PropertyList({ properties, selectedId, searchQuery, onSearchChange, onPropertyClick, boroughs }: PropertyListProps) {
     return (
-        <aside className="absolute top-24 left-6 z-10 w-[380px] h-[calc(100vh-140px)] bg-slate-950/90 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden animate-in fade-in slide-in-from-left-4 duration-300">
-            <div className="p-4 border-b border-slate-800/60 bg-slate-900/50">
-                <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] text-green-400 uppercase tracking-[0.2em] font-bold flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                        Node Index
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-mono">{properties.length} Results</span>
-                </div>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search address or borough..."
-                        value={searchQuery}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        className="w-full bg-slate-950/80 border border-slate-700/60 rounded-lg pl-8 pr-4 py-2 text-xs text-slate-300 font-mono focus:outline-none focus:border-green-500/50 focus:shadow-[0_0_10px_rgba(34,197,94,0.15)] transition-all"
-                    />
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">🔍</span>
-                </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-2 space-y-1.5" style={{ scrollbarWidth: "thin", scrollbarColor: "#334155 transparent" }}>
-                {properties.map((prop: any) => {
-                    const isSelected = selectedId === prop.id;
-                    const borough = prop.borough || boroughs[prop.address] || "NYC";
-                    return (
-                        <div
-                            key={prop.id}
-                            onClick={() => onPropertyClick(prop)}
-                            className={`p-3 rounded-lg cursor-pointer transition-all border ${
-                                isSelected
-                                    ? "bg-green-500/10 border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.1)]"
-                                    : "bg-slate-900/40 border-slate-800/50 hover:bg-slate-800/60 hover:border-slate-700/50"
-                            }`}
-                        >
-                            <div className="flex justify-between items-start mb-1.5">
-                                <span className={`text-xs font-bold font-mono tracking-wide ${isSelected ? "text-green-400" : "text-slate-200"}`}>
-                                    {prop.address}
-                                </span>
-                                <span className="text-[9px] text-slate-500 uppercase tracking-widest">{borough}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-xs font-mono">
-                                <span className={isSelected ? "text-green-300 font-bold" : "text-slate-400"}>
-                                    ${(prop.price / 1e6).toFixed(2)}M
-                                </span>
-                                <span className="text-slate-500 text-[10px]">
-                                    {prop.sqft} sqft &bull; {prop.bedrooms}BD
-                                </span>
-                            </div>
-                        </div>
-                    );
-                })}
-                {properties.length === 0 && (
-                    <div className="p-6 text-center text-slate-500 text-xs font-mono">
-                        No active nodes found matching parameters.
+        <div className="absolute top-28 left-6 bottom-6 w-[400px] z-[1000] pointer-events-none flex flex-col">
+            <div className="flex-1 pointer-events-auto bg-nexus-800/85 backdrop-blur-2xl border border-nexus-700/50 rounded-2xl shadow-glass flex flex-col overflow-hidden">
+                
+                {/* Header */}
+                <div className="bg-gradient-to-r from-nexus-700/40 to-transparent p-4 border-b border-nexus-700/50 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-nexus-cyan animate-pulse shadow-neon-cyan"></div>
+                        <h2 className="font-display font-bold text-slate-200 text-sm tracking-[0.2em] uppercase">Property Registry</h2>
                     </div>
-                )}
+                    <span className="font-mono text-[9px] text-nexus-cyan border border-nexus-cyan/30 bg-nexus-cyan/10 px-2 py-0.5 rounded uppercase tracking-widest">{properties.length} FOUND</span>
+                </div>
+
+                {/* List Body */}
+                <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                    {properties.map(prop => {
+                        const ext = prop as any;
+                        const priceM = (prop.price / 1_000_000).toFixed(2);
+                        const roi = ext.annualizedRoi ? ext.annualizedRoi.toFixed(1) : "?";
+                        const score = ext.securityScore || 0;
+                        const scoreColor = score >= 65 ? "text-nexus-neon" : score >= 40 ? "text-yellow-400" : "text-red-500";
+
+                        return (
+                            <div 
+                                key={prop.id}
+                                onClick={() => onSelect(prop)}
+                                className="group cursor-pointer bg-nexus-900/40 hover:bg-nexus-700/40 border border-nexus-700/30 hover:border-nexus-cyan/50 rounded-xl p-4 transition-all duration-300 relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 left-0 w-1 h-full bg-nexus-700/50 group-hover:bg-nexus-cyan transition-colors"></div>
+                                
+                                <div className="pl-2">
+                                    <h3 className="font-mono text-xs text-slate-200 group-hover:text-white mb-2 leading-tight uppercase truncate">{prop.address}</h3>
+                                    
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div>
+                                            <span className="block font-mono text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">Value</span>
+                                            <span className="font-mono text-[11px] text-nexus-cyan font-bold">${priceM}M</span>
+                                        </div>
+                                        <div>
+                                            <span className="block font-mono text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">ROI</span>
+                                            <span className="font-mono text-[11px] text-slate-300">{roi}%</span>
+                                        </div>
+                                        <div>
+                                            <span className="block font-mono text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">Security</span>
+                                            <span className={`font-mono text-[11px] ${scoreColor} font-bold`}>{score}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+                
             </div>
-        </aside>
+        </div>
     );
 }

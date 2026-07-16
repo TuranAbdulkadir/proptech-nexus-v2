@@ -9,17 +9,6 @@ import SecurityTerminal from "./SecurityTerminal";
 import StatsPanel from "./StatsPanel";
 import PropertyList from "./PropertyList";
 
-const PROPERTY_IMAGES = [
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1600566753086-00f18e6f5dbb?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&q=80&w=800",
-];
-
 export default function DashboardClient({ initialMetrics }: { initialMetrics: any }) {
     const [properties, setProperties] = useState<Property[]>([]);
     const [selectedProperty, setSelectedProperty] = useState<PropertyExtended | null>(null);
@@ -109,18 +98,14 @@ export default function DashboardClient({ initialMetrics }: { initialMetrics: an
             {showPropertyList && (
                 <PropertyList
                     properties={filteredListProperties}
-                    selectedId={selectedId}
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    onPropertyClick={handlePropertyClick}
-                    boroughs={{}} // We can pass empty since we added borough directly to real properties
+                    onSelect={handlePropertyClick}
                 />
             )}
 
             <AuditSidebar
                 property={selectedProperty}
-                borough={selectedProperty ? (selectedProperty as any).borough || "NYC" : ""}
-                imageUrl={selectedProperty ? PROPERTY_IMAGES[parseInt(selectedProperty.id.replace(/\D/g, "") || "0") % PROPERTY_IMAGES.length] : ""}
+                borough={selectedProperty ? (selectedProperty as any).borough || "King County" : ""}
+                imageUrl={selectedProperty ? `https://loremflickr.com/800/600/mansion,architecture?lock=${parseInt(selectedProperty.id.replace(/\D/g, "") || "0") % 100000}` : ""}
                 onClose={() => { setSelectedProperty(null); setSelectedId(null); }}
             />
             <SecurityTerminal />
