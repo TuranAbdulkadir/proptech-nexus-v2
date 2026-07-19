@@ -90,13 +90,13 @@ export default function DashboardClient({ initialMetrics }: { initialMetrics: an
             <div className="w-[380px] h-full flex flex-col border-r border-[#1a1a1a] bg-[#0a0a0a] shrink-0 z-20">
                 <div className="p-5 border-b border-[#1a1a1a] flex items-center gap-3">
                     <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]">
-                        N
+                        PTN
                     </div>
                     <div>
                         <h1 className="font-bold text-sm tracking-[0.15em] text-white leading-tight">PROPTECH NEXUS</h1>
                         <div className="flex items-center gap-1.5 mt-0.5">
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                            <span className="text-[9px] text-green-500 tracking-widest uppercase font-mono">Global Sentinel Active</span>
+                            <span className="text-[9px] text-green-500 tracking-widest uppercase font-mono">System Active</span>
                         </div>
                     </div>
                 </div>
